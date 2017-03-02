@@ -23,17 +23,17 @@ public class FourSquareCorner {
 	Sorting sort = Sorting.getInstance();
 	ComputerVision vision = ComputerVision.getInstance();
 	
-	public Mat Normalize(Mat original){
+	public Mat Normalize(Mat original, Boolean isDebug){
 		
 		Mat paper = original.clone();
-		//vision.gaussianBlur(paper);
+
 		
 		vision.grayscale(paper);
 		vision.threshold(paper,true);
 		ArrayList<MatOfPoint> squareConts = vision.getSquareContours(paper, 60);
 		
 		List<Point> points = new ArrayList<>();
-		List<MatOfPoint> cornerBoxes = this.getCornerBoxes(squareConts);
+		List<MatOfPoint> cornerBoxes = this.getCornerBoxes(squareConts,paper.height(),paper.width());
 		
 		points.add(getBL(cornerBoxes.get(0)));
 		points.add(getBR(cornerBoxes.get(1)));
@@ -42,30 +42,85 @@ public class FourSquareCorner {
 		
 		Mat normalized = getFourpointTransform(points, original);
 		
-		Imgcodecs.imwrite("scratch/normalized"+".png", normalized);		
-		Imgproc.circle(original, points.get(0) , 10, new Scalar(0,0,0), 8);
-		Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255), 8);
-		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0), 8);
-		Imgproc.circle(original, points.get(3) , 50, new Scalar(255,0,0), 50);
-		Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0),8);
-		Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255),8);
-		Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0),8);
-		Imgproc.drawContours(original, cornerBoxes, 3, new Scalar(255,0,0),8);
+		if(isDebug){
+			Imgcodecs.imwrite("scratch/normalized"+".png", normalized);		
+			Imgproc.circle(original, points.get(0) , 10, new Scalar(0,0,0), 8);
+			Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255), 8);
+			Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0), 8);
+			Imgproc.circle(original, points.get(3) , 50, new Scalar(255,0,0), 50);
+			Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0),8);
+			Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255),8);
+			Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0),8);
+			Imgproc.drawContours(original, cornerBoxes, 3, new Scalar(255,0,0),8);
+			Imgcodecs.imwrite("scratch/TheConts"+".png", original);
+		}
 		
-		Imgcodecs.imwrite("scratch/TheConts"+".png", original);
-		return paper;
+		
+		return normalized;
 	}
+	
+
+	public List<MatOfPoint> getCornerBoxes(List<MatOfPoint> squareConts, int height, int width){
+		List<MatOfPoint> cornerSquares = new ArrayList<>();
+		
+		int tlIndex, trIndex, blIndex, brIndex; 
+		//double tlDist, trDist, blDist, brDist;
+		int size = squareConts.size();
+		MatOfPoint tempCont;
+		
+		int i = 1;		
+		tlIndex=0; 
+		trIndex=0;
+		blIndex=0;
+		brIndex=0;
+		
+		Point tlPoint = new Point(0,0);
+		Point trPoint = new Point (width,0);
+		Point blPoint = new Point(0,height);
+		Point brPoint = new Point(width,height);
+		
+		do{
+			tempCont = squareConts.get(i);
+			if(computeDistance(tlPoint, getTL(tempCont)) < computeDistance(tlPoint, getTL(squareConts.get(tlIndex)))){
+				tlIndex = i;
+			}
+			
+			if(computeDistance(trPoint, getTR(tempCont)) < computeDistance(trPoint, getTR(squareConts.get(trIndex)))){
+				trIndex = i;
+			}
+			
+			if(computeDistance(brPoint, getBR(tempCont)) < computeDistance(brPoint, getBR(squareConts.get(brIndex)))){
+				brIndex = i;
+			}
+			
+			if(computeDistance(blPoint, getBL(tempCont)) < computeDistance(blPoint, getBL(squareConts.get(blIndex)))){
+				blIndex = i;
+			}
+			
+			i++;
+		}while(i <size);
+		 	
+		
+		cornerSquares.add(squareConts.get(tlIndex));
+		cornerSquares.add(squareConts.get(trIndex));
+		cornerSquares.add(squareConts.get(brIndex));
+		cornerSquares.add(squareConts.get(blIndex));
+		
+		return cornerSquares;
+	}
+	
+	
+	
 	
 	
 	public List<MatOfPoint> getCornerBoxes(List<MatOfPoint> squareConts){
 		List<MatOfPoint> cornerSquares = new ArrayList<>();
 		squareConts = sort.contourPositions(squareConts);
-			
 		cornerSquares.add(squareConts.get(1));
 		cornerSquares.add(squareConts.get(0));
 		cornerSquares.add(squareConts.get(squareConts.size()-1));
 		cornerSquares.add(squareConts.get(squareConts.size()-2));
-		
+
 		return cornerSquares;
 	}
 	
