@@ -16,6 +16,7 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		System.out.println("Hello world");
 		Mat image = Imgcodecs.imread("input"+File.separator+"x1.jpg");
 		Form form = new FormPatientInfo();
 		form.setImage(image);
