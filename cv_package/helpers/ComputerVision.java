@@ -1,4 +1,4 @@
-package helpers;
+package cv_package.helpers;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;

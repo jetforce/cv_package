@@ -1,4 +1,4 @@
-package fields;
+package cv_package.fields;
 import org.opencv.core.Mat;
 
 public class Text {

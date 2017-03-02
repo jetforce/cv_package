@@ -1,10 +1,10 @@
-package forms;
+package cv_package.forms;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.MatOfPoint;
 
-import fields.Text;
+import cv_package.fields.Text;
 
 /**
  * Created by Hannah on 2/13/2017.

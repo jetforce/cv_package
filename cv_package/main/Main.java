@@ -1,4 +1,4 @@
-package main;
+package cv_package.main;
 
 import java.io.File;
 
@@ -6,10 +6,10 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
-import forms.Form;
-import forms.FormPatientInfo;
-import segmentation.FourSquareCorner;
-import segmentation.Segmentation;
+import cv_package.forms.Form;
+import cv_package.forms.FormPatientInfo;
+import cv_package.segmentation.FourSquareCorner;
+import cv_package.segmentation.Segmentation;
 
 public class Main {
 

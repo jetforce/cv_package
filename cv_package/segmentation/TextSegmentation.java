@@ -1,4 +1,4 @@
-package segmentation;
+package cv_package.segmentation;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -14,12 +14,12 @@ import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import fields.Text;
-import filesaving.FileSave;
-import forms.Form;
-import helpers.ComputerVision;
-import helpers.Filtering;
-import helpers.Sorting;
+import cv_package.fields.Text;
+import cv_package.filesaving.FileSave;
+import cv_package.forms.Form;
+import cv_package.helpers.ComputerVision;
+import cv_package.helpers.Filtering;
+import cv_package. helpers.Sorting;
 
 public class TextSegmentation {
 

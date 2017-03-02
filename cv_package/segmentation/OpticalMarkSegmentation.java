@@ -1,4 +1,4 @@
-package segmentation;
+package cv_package.segmentation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import helpers.ComputerVision;
-import helpers.Filtering;
-import helpers.HierarchyHandler;
-import helpers.Sorting;
+import cv_package.helpers.ComputerVision;
+import cv_package.helpers.Filtering;
+import cv_package.helpers.HierarchyHandler;
+import cv_package.helpers.Sorting;
 
 public class OpticalMarkSegmentation {
 
