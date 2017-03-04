@@ -21,7 +21,7 @@ public class Main {
 		Form form = new FormPatientInfo();
 		form.setImage(image);
 		Segmentation s = Segmentation.getInstance();
-		s.segment(form);
+		//s.segment(form);
 		System.out.println("[END]");
 	}
 	

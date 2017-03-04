@@ -56,6 +56,8 @@ public class FourSquareCorner {
 		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0,255), 8);
 		Imgproc.circle(original, points.get(3) , 10, new Scalar(255,0,0,255), 8);
 
+
+
 		Log.d(TAG,"areas of box 1 :"+Imgproc.contourArea(cornerBoxes.get(0)));
 		Log.d(TAG,"areas of box 2 :"+Imgproc.contourArea(cornerBoxes.get(1)));
 		Log.d(TAG,"areas of box 3 :"+Imgproc.contourArea(cornerBoxes.get(2)));

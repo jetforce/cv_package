@@ -32,7 +32,7 @@ public class Segmentation {
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
 	private static TextSegmentation textSeg = TextSegmentation.getInstance();
-	private static OpticalMarkSegmentation markSeg = OpticalMarkSegmentation.getInstance();
+	private static OpticalMarkSegmentation markSeg;
 	
 	// Field Type Variables
 	private final int FIELDTYPE_TEXT = 1;
@@ -48,8 +48,12 @@ public class Segmentation {
     private static Segmentation segmenter = new Segmentation();
     public static Segmentation getInstance() { return segmenter; }
     private Segmentation() { }
-	
-    public Form segment(Form form) {
+	private File directory;
+
+
+    public void segment(Form form, File directory) {
+		markSeg = new OpticalMarkSegmentation(directory);
+		this.directory = directory;
     	List<MatOfPoint> groupContours;
     	Mat paperImage = form.getImage();
     	
@@ -80,14 +84,15 @@ public class Segmentation {
 					System.out.println("     [OK] Group # " + i + " SEGMENTATION: Letters Good");
 					break;
 				case FIELDTYPE_MARK:
-					temp = markSeg.recognize(groupImages.get(i), form.getElementCount()[i]);
+					temp = markSeg.recognize(groupImages.get(i), form.getElementCount()[i], i);
 					form.setAnswer(i,new MarkAnswer(temp));
-
 					break;
+
+
 				case FIELDTYPE_BLOB:
 			}
 		}
-		return form;
+		//return form;
 	}
     
     public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {

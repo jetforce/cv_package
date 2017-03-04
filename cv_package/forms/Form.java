@@ -22,6 +22,7 @@ public class Form {
 	// Major Field Types
 	private int groupCount;
 	private int[] groupTypes;
+
 	
 	// Total First Layer External Contours
 	int totalContours;
@@ -80,7 +81,7 @@ public class Form {
 	}
 
 	public void setGuideMatch(int[] guideMatch) {
-		this.guideMatch = guideMatch;
+		this.guideMatch =  guideMatch;
 	}
 
 	public Answer[] getAnswers(){return this.answers;}
