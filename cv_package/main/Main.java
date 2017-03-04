@@ -23,7 +23,6 @@ public class Main {
 		Segmentation s = Segmentation.getInstance();
 		s.segment(form);
 		System.out.println("[END]");
-		
 	}
 	
 }

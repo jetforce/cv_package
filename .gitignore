@@ -1,1 +1,4 @@
-**/com
+/*
+/*/
+!/cv_package/
+!.gitignore
