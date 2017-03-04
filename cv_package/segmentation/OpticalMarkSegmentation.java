@@ -1,5 +1,9 @@
 package cv_package.segmentation;
 
+import android.util.Log;
+
+import com.virtusio.sibayan.thesis.activities.HomeActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.opencv.core.MatOfPoint;
@@ -26,16 +30,13 @@ public class OpticalMarkSegmentation {
 	private static HierarchyHandler hierarchyHandler =  HierarchyHandler.getInstance();
 	
 	
-	public void recognize(Mat box,int i){
-		
-		//Imgcodecs.imwrite("scratch/test_boxes"+i+".png", box);
+	public int[] recognize(Mat box,int numChoices){
 
+		int answerValues[] = new int[numChoices];
+
+		//Imgcodecs.imwrite("scratch/test_boxes"+i+".png", box);
 		List<MatOfPoint> contours = new ArrayList<>();
-		
-		
 		Mat hierarchy = new Mat();
-		
-		
 		Imgproc.findContours(box, contours, hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
 		//System.out.println("contour size"+ contours.size());
 		//System.out.println(i+ ") This is the hierarchy "+ hierarchy.dump()+ " Width "+ hierarchy.width()+" Height "+hierarchy.height());
@@ -46,7 +47,6 @@ public class OpticalMarkSegmentation {
     	//Mat innerBox = box.submat(rect);
     	
     	int largestContour = hierarchyHandler.getLargestBoundingBox(contours);
-    	
     	ArrayList<Integer> children = hierarchyHandler.getChildren(largestContour, hierarchy);
     	
     	if(children.size() == 1 && hierarchy.get(0, children.get(0))[2] != -1){
@@ -55,7 +55,6 @@ public class OpticalMarkSegmentation {
     	
     	
     	List<MatOfPoint> circles = new ArrayList<>();
-    	
     	System.out.println("Number of children "+ children.size());
     	Rect rect;
     	for(int x: children){
@@ -73,7 +72,9 @@ public class OpticalMarkSegmentation {
     	for(int x=0; x<circles.size();x++){
     		rect = Imgproc.boundingRect(circles.get(x));
     		roi = new Mat(box,rect);
-    		System.out.println("Choice "+x+" ,"+countWhite(roi));
+			Log.d(HomeActivity.TAG,"SIZE "+countWhite(roi));
+			//answerValues[x] = countWhite(roi);
+    		//System.out.println("Choice "+x+" ,"+countWhite(roi));
     		//Imgproc.rectangle(box, rect.tl(), rect.br(), new Scalar(255,255,255),-1);
     		//Imgproc.putText(box, "Number "+x , rect.tl(), Core.FONT_HERSHEY_PLAIN, (double)20.0 , new Scalar(0,255,255));
     	
@@ -81,9 +82,9 @@ public class OpticalMarkSegmentation {
     	
     	
     	//Imgproc.drawContours(box,contours, largestContour,new Scalar(255,255,255),-1);
-    	Imgcodecs.imwrite("scratch/Final"+i+".png", box);
+    	//Imgcodecs.imwrite("scratch/Final"+i+".png", box);
     	//Imgcodecs.imwrite("scratch/inner_boxes"+i+".png", innerBox);
-		
+		return answerValues;
 	}
 	
 	

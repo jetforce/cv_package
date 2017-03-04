@@ -77,9 +77,14 @@ public class ComputerVision {
     public MatOfPoint getSquareApprox(MatOfPoint thisContour){
         MatOfPoint2f thisContour2f = new MatOfPoint2f();
         MatOfPoint approxContour = new MatOfPoint();
+
         MatOfPoint2f approxContour2f = new MatOfPoint2f();
 
+
+
+
         thisContour.convertTo(thisContour2f, CvType.CV_32FC2);
+
         double perimeter = Imgproc.arcLength(thisContour2f,true);
 
         Imgproc.approxPolyDP(thisContour2f, approxContour2f, perimeter*0.04, true);

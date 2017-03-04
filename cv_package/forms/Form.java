@@ -8,6 +8,9 @@ import org.opencv.core.MatOfPoint;
 public class Form {
 
 	// Image
+
+	public Answer[] answers;
+
 	protected Mat image;
 	
 	// Guides & Major Segments
@@ -79,5 +82,11 @@ public class Form {
 	public void setGuideMatch(int[] guideMatch) {
 		this.guideMatch = guideMatch;
 	}
-	
+
+	public Answer[] getAnswers(){return this.answers;}
+
+	public void setAnswer(int index, Answer ans){
+		this.answers[index] = ans;
+	}
+
 }

@@ -38,6 +38,7 @@ public class FormMarks extends Form{
 	    
 	    public FormMarks() {
 	    	super();
+			answers = new Answer[4];
 	    	this.guideCount = 0;
 	    	int[] guideMatch = {};
 	    	this.setGuideMatch(guideMatch);
@@ -45,13 +46,13 @@ public class FormMarks extends Form{
 	    	int[] fieldTypes = {2, 2, 2, 2};
 	    	this.setGroupTypes(fieldTypes);
 	    	this.totalContours = guideCount + getGroupCount();
-	    	int[] elementCount = {3, 9, 1, 1, 8, 9, 1};
+	    	int[] elementCount = {6, 6, 6, 6};
 	    	this.setElementCount(elementCount);
-
 	    	this.setGroups();
 	    	this.addGroup(basicDetails);
 	    	this.addGroup(patientDetails);	    	
 	    }
+
 
 	
 	
