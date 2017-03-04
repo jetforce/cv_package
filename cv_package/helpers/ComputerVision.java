@@ -23,7 +23,7 @@ public class ComputerVision {
     }
 
     public void threshold(Mat image, boolean isInverted) {
-        Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 105, 6);
+        Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 305, 6);
         if(isInverted)
         	Imgproc.threshold(image, image, 100, 255, Imgproc.THRESH_BINARY_INV);
     }
