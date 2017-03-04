@@ -59,7 +59,7 @@ public class TextSegmentation {
     	return adjImages;
     }
 
-    public void segment(Mat groupImage, Form form, int groupIndex) {
+    public List segment(Mat groupImage, Form form, int groupIndex) {
 		List<Object> group = form.getGroups().get(groupIndex);
 
 		List<MatOfPoint> textContours = cv.findContours(groupImage.clone(), Imgproc.RETR_EXTERNAL);
@@ -70,8 +70,9 @@ public class TextSegmentation {
 		List<MatOfPoint> letterContours;
 		Mat textImage, textImageInv, temp;
 		int letterCount;
-		
 		int size = textImages.size();
+		
+		List<Mat> letterImages = new ArrayList<>();
 		for(int textIndex = 0; textIndex < size; textIndex++) {
 			letterCount = ((Text)group.get(textIndex)).getLetterCount();
 			textImage = textImages.get(textIndex).clone();
@@ -85,17 +86,22 @@ public class TextSegmentation {
 			cv.morph(temp, Imgproc.MORPH_DILATE, Imgproc.MORPH_RECT, 5);
 	    	letterContours = cv.findContours(temp, Imgproc.RETR_EXTERNAL);
 	    	letterContours = filterElements(letterContours, letterCount);
-	    	List<Mat> letterImages = filter.borderRemoval(letterContours, textImage, false);
+	    	letterImages = filter.borderRemoval(letterContours, textImage, false);
 	    	letterImages = cleanImages(letterImages);
 	    	
-	    	String folderName = "text_" + groupIndex + "_" + textIndex;
-	    	File folder = new File(folderName);
+	    	String segmentName = "segment_output";
+	    	File folder = new File(segmentName);
+	    	folder.mkdir();
+	    	String folderName = segmentName + File.separator + groupIndex + "_" + textIndex;
+	    	folder = new File(folderName);
 	    	folder.mkdir();
 	    	
 	    	for(int i = 0; i < letterImages.size(); i++) {
 	    		Imgcodecs.imwrite(folderName + File.separator + i + ".png", letterImages.get(i));
 	    	}
 		}
+		
+		return letterImages;
     }
     
     public List<Mat> cleanImages(List<Mat> letterImages) {
