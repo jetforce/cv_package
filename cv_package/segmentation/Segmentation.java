@@ -45,7 +45,7 @@ public class Segmentation {
     public static Segmentation getInstance() { return segmenter; }
     private Segmentation() { }
 	
-    public List segment(Form form) {
+    public void segment(Form form) {
     	List<MatOfPoint> groupContours;
     	Mat paperImage = form.getImage();
     	
@@ -68,13 +68,11 @@ public class Segmentation {
 		
 		int size = groupImages.size();
 				
-		List<List<Mat>> segmentedImages = new ArrayList<>();
-		
 		for(int i = 0; i < size; i++) {
 			
 			switch(groupTypes[i]) {
 				case FIELDTYPE_TEXT: 
-					segmentedImages.add(textSeg.segment(groupImages.get(i).clone(), form, i));
+					textSeg.segment(groupImages.get(i).clone(), form, i);
 					System.out.println("     [OK] Group # " + i + " SEGMENTATION: Letters Good");
 					break;
 				case FIELDTYPE_MARK: 
@@ -82,8 +80,6 @@ public class Segmentation {
 				case FIELDTYPE_BLOB:
 			}
 		}
-		
-		return segmentedImages;
 	}
     
     public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {
