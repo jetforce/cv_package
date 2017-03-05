@@ -21,7 +21,7 @@ import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package. helpers.Sorting;
 
-public class TextSegmentation {
+public class TextSegmentation extends ImageSaver {
 
 	private static ComputerVision cv = ComputerVision.getInstance();
 	private static Sorting sort = Sorting.getInstance();
@@ -87,13 +87,17 @@ public class TextSegmentation {
 	    	letterContours = filterElements(letterContours, letterCount);
 	    	List<Mat> letterImages = filter.borderRemoval(letterContours, textImage, false);
 	    	letterImages = cleanImages(letterImages);
-	    	
-	    	String folderName = "text_" + groupIndex + "_" + textIndex;
-	    	File folder = new File(folderName);
+
+	    	String textSegName = "text_seg_out";
+	    	File folder = new File(textSegName);
+	    	folder.mkdir();
+	    	String folderName = textSegName + File.separator + groupIndex + "_" + textIndex;
+	    	folder = new File(folderName);
 	    	folder.mkdir();
 	    	
 	    	for(int i = 0; i < letterImages.size(); i++) {
 	    		Imgcodecs.imwrite(folderName + File.separator + i + ".png", letterImages.get(i));
+	    		saveImage(folderName, letterImages.get(i));
 	    	}
 		}
     }
