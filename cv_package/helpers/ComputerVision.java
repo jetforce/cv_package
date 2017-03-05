@@ -23,7 +23,7 @@ public class ComputerVision {
     }
 
     public void threshold(Mat image, boolean isInverted) {
-        Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 105, 6);
+        Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 305, 6);
         if(isInverted)
         	Imgproc.threshold(image, image, 100, 255, Imgproc.THRESH_BINARY_INV);
     }
@@ -77,9 +77,14 @@ public class ComputerVision {
     public MatOfPoint getSquareApprox(MatOfPoint thisContour){
         MatOfPoint2f thisContour2f = new MatOfPoint2f();
         MatOfPoint approxContour = new MatOfPoint();
+
         MatOfPoint2f approxContour2f = new MatOfPoint2f();
 
+
+
+
         thisContour.convertTo(thisContour2f, CvType.CV_32FC2);
+
         double perimeter = Imgproc.arcLength(thisContour2f,true);
 
         Imgproc.approxPolyDP(thisContour2f, approxContour2f, perimeter*0.04, true);

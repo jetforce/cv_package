@@ -17,10 +17,9 @@ public class Sorting {
 	
     private static Sorting cv = new Sorting();
     public static Sorting getInstance() { return cv; }
-    private Sorting() { }
+    private Sorting(){ }
     
     // Position Sorting
-    
     public List<MatOfPoint> contourPositions(List<MatOfPoint> contours) {
     	List<MatOfPoint> contours2 = new ArrayList<>(contours);
     	Collections.sort(contours2, positionSorter);
@@ -32,10 +31,9 @@ public class Sorting {
         public int compare(MatOfPoint c1, MatOfPoint c2) {
         	Rect r1 = Imgproc.boundingRect(c1);
         	Rect r2 = Imgproc.boundingRect(c2);
-
         	int n;
         	int diff = r1.y - r2.y;
-        	
+
         	// IF y values are too close to each other (probably at the same level) then compare x values instead
             if ( diff >= -TEXTBOX_OFFSET && diff <= TEXTBOX_OFFSET )		
             	n = Double.compare(r1.x, r2.x);

@@ -18,17 +18,21 @@ import org.opencv.imgproc.Imgproc;
 import cv_package.fields.Text;
 import cv_package.filesaving.FileSave;
 import cv_package.forms.Form;
+import cv_package.forms.MarkAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
 
 public class Segmentation {
 
+
+	public static String TAG = "SEGMENTATION";
 	private static ComputerVision cv = ComputerVision.getInstance();
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
 	private static TextSegmentation textSeg = TextSegmentation.getInstance();
+	private static OpticalMarkSegmentation markSeg;
 	
 	// Field Type Variables
 	private final int FIELDTYPE_TEXT = 1;
@@ -44,15 +48,19 @@ public class Segmentation {
     private static Segmentation segmenter = new Segmentation();
     public static Segmentation getInstance() { return segmenter; }
     private Segmentation() { }
-	
-    public void segment(Form form) {
+	private File directory;
+
+
+    public void segment(Form form, File directory) {
+		markSeg = new OpticalMarkSegmentation(directory);
+		this.directory = directory;
     	List<MatOfPoint> groupContours;
     	Mat paperImage = form.getImage();
     	
     	// PREPROCESS
-		paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
+		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
-		Imgcodecs.imwrite("test.png", paperImage);
+		//Imgcodecs.imwrite("test.png", paperImage);
 		
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
 		groupContours = filterGroups(groupContours, form.getGroupCount());
@@ -67,7 +75,7 @@ public class Segmentation {
 		List<Mat> groupImages = filter.borderRemoval(groupContours, sampleImage.clone(), true);
 		
 		int size = groupImages.size();
-				
+		int[] temp;
 		for(int i = 0; i < size; i++) {
 			
 			switch(groupTypes[i]) {
@@ -75,11 +83,16 @@ public class Segmentation {
 					textSeg.segment(groupImages.get(i).clone(), form, i);
 					System.out.println("     [OK] Group # " + i + " SEGMENTATION: Letters Good");
 					break;
-				case FIELDTYPE_MARK: 
+				case FIELDTYPE_MARK:
+					temp = markSeg.recognize(groupImages.get(i), form.getElementCount()[i], i);
+					form.setAnswer(i,new MarkAnswer(temp));
 					break;
+
+
 				case FIELDTYPE_BLOB:
 			}
 		}
+		//return form;
 	}
     
     public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {
