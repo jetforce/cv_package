@@ -31,7 +31,7 @@ public class Segmentation {
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
-	private static TextSegmentation textSeg = TextSegmentation.getInstance();
+	private static TextSegmentation textSeg;
 	private static OpticalMarkSegmentation markSeg;
 	
 	// Field Type Variables
@@ -52,7 +52,9 @@ public class Segmentation {
 
 
     public void segment(Form form, File directory) {
+		textSeg = new TextSegmentation(directory);
 		markSeg = new OpticalMarkSegmentation(directory);
+		
 		this.directory = directory;
     	List<MatOfPoint> groupContours;
     	Mat paperImage = form.getImage();

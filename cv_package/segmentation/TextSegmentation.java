@@ -30,9 +30,12 @@ public class TextSegmentation extends ImageSaver {
 
     public final int MIDDLE_OFFSET_Y = 10;
 
-    private static TextSegmentation textSeg = new TextSegmentation();
-    public static TextSegmentation getInstance() { return textSeg; }
-    private TextSegmentation() { }
+//    private static TextSegmentation textSeg = new TextSegmentation();
+//    public static TextSegmentation getInstance() { return textSeg; }
+    
+    public TextSegmentation(File directory) {
+		super(directory);
+	}
     
     public List<Mat> erodeImages(List<Mat> images) {
     	int size = images.size();
