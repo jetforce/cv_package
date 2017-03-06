@@ -27,7 +27,7 @@ public class Driver {
 		corner.Normalize(image,true);
 		Form form = new FormMarks();
 		form.setImage(image);
-		Segmentation s = Segmentation.getInstance();
+		//Segmentation s = Segmentation.getInstance();
 		//s.segment(form);
 		System.out.println("[END]");
 	}

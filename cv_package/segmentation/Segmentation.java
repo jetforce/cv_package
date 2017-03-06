@@ -1,4 +1,6 @@
 package cv_package.segmentation;
+import android.util.Log;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,8 +19,11 @@ import org.opencv.imgproc.Imgproc;
 
 import cv_package.fields.Text;
 import cv_package.filesaving.FileSave;
+import cv_package.filesaving.LocalSaver;
+import cv_package.forms.BlobAnswer;
 import cv_package.forms.Form;
 import cv_package.forms.MarkAnswer;
+import cv_package.forms.TextAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
@@ -31,83 +36,96 @@ public class Segmentation {
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
-	private static TextSegmentation textSeg = TextSegmentation.getInstance();
+	private static TextSegmentation textSeg;
 	private static OpticalMarkSegmentation markSeg;
-	
+
+	private LocalSaver saver;
+
 	// Field Type Variables
 	private final int FIELDTYPE_TEXT = 1;
 	private final int FIELDTYPE_MARK = 2;
 	private final int FIELDTYPE_BLOB = 3;
-	
+
 	// Image Modification Variables
 	public final int BORDER_THICKNESS_PAPER = 10;
-    
-    // Image
+
+	// Image
 //    Mat binaryImage;
-	
-    private static Segmentation segmenter = new Segmentation();
-    public static Segmentation getInstance() { return segmenter; }
-    private Segmentation() { }
-	private File directory;
 
 
-    public void segment(Form form, File directory) {
-		markSeg = new OpticalMarkSegmentation(directory);
-		this.directory = directory;
-    	List<MatOfPoint> groupContours;
-    	Mat paperImage = form.getImage();
-    	
-    	// PREPROCESS
+
+	public Segmentation(LocalSaver saver) {
+		this.saver = saver;
+	}
+
+
+
+	public void segment(Form form) {
+		textSeg = new TextSegmentation(saver);
+		markSeg = new OpticalMarkSegmentation(saver);
+
+		Log.i("HANNAH > ", "1");
+		List<MatOfPoint> groupContours;
+		Mat paperImage = form.getImage();
+
+		Log.i("HANNAH > ", "2");
+
+		// PREPROCESS
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
 		//Imgcodecs.imwrite("test.png", paperImage);
-		
+
+		Log.i("HANNAH > ", "3");
+
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
 		groupContours = filterGroups(groupContours, form.getGroupCount());
-		
+
+		Log.i("HANNAH > ", "4");
+
 		int[] groupTypes = form.getGroupTypes();
-		
+
 		System.out.println("[OK] SEGMENTATION: Major Groups Good");
 
 		Mat sampleImage = paperImage.clone();
 		cv.invert(sampleImage);
 
 		List<Mat> groupImages = filter.borderRemoval(groupContours, sampleImage.clone(), true);
-		
+
 		int size = groupImages.size();
 		int[] temp;
 		for(int i = 0; i < size; i++) {
-			
+
 			switch(groupTypes[i]) {
-				case FIELDTYPE_TEXT: 
-					textSeg.segment(groupImages.get(i).clone(), form, i);
+				case FIELDTYPE_TEXT:
+					List<List<Mat>> images = textSeg.segment(groupImages.get(i).clone(), form, i);
+					form.setAnswer(i, new TextAnswer(images));
 					System.out.println("     [OK] Group # " + i + " SEGMENTATION: Letters Good");
 					break;
 				case FIELDTYPE_MARK:
 					temp = markSeg.recognize(groupImages.get(i), form.getElementCount()[i], i);
 					form.setAnswer(i,new MarkAnswer(temp));
 					break;
-
-
 				case FIELDTYPE_BLOB:
+					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
 			}
+			Log.i("HANNAH > ", "done " + i);
 		}
 		//return form;
 	}
-    
-    public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {
-    	List<MatOfPoint> contours2 = new ArrayList<>(contours);
-    	contours2 = filter.getLargestN(contours2, elementCount);
-    	contours2 = sort.contourPositions(contours2);
-    	return contours2;
-    }
-            
-    public Mat cropBorder(Mat image, int thickness) {
-        int rowStart 	= thickness;
-        int rowEnd 		= image.rows() - thickness;
-        int colStart 	= thickness;
-        int colEnd 		= image.cols() - thickness;
-        
-        return image.submat(rowStart, rowEnd, colStart, colEnd);
-    }
+
+	public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours2 = filter.getLargestN(contours2, elementCount);
+		contours2 = sort.contourPositions(contours2);
+		return contours2;
+	}
+
+	public Mat cropBorder(Mat image, int thickness) {
+		int rowStart 	= thickness;
+		int rowEnd 		= image.rows() - thickness;
+		int colStart 	= thickness;
+		int colEnd 		= image.cols() - thickness;
+
+		return image.submat(rowStart, rowEnd, colStart, colEnd);
+	}
 }

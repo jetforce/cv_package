@@ -1,4 +1,5 @@
 package cv_package.helpers;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -25,7 +26,7 @@ public class ComputerVision {
     public void threshold(Mat image, boolean isInverted) {
         Imgproc.adaptiveThreshold(image, image, 255, Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C, Imgproc.THRESH_BINARY, 305, 6);
         if(isInverted)
-        	Imgproc.threshold(image, image, 100, 255, Imgproc.THRESH_BINARY_INV);
+            Imgproc.threshold(image, image, 100, 255, Imgproc.THRESH_BINARY_INV);
     }
     
     public void invert(Mat image) {

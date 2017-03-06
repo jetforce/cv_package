@@ -1,6 +1,15 @@
 package cv_package.segmentation;
 
+import android.graphics.Bitmap;
+import android.util.Log;
+
+import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
+import com.virtusio.sibayan.image_process.helpers.ImageSaver;
+import com.virtusio.sibayan.thesis.activities.HomeActivity;
+
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,184 +25,225 @@ import org.opencv.imgproc.Imgproc;
 
 import cv_package.fields.Text;
 import cv_package.filesaving.FileSave;
+import cv_package.filesaving.LocalSaver;
 import cv_package.forms.Form;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package. helpers.Sorting;
 
-public class TextSegmentation extends ImageSaver {
+public class TextSegmentation{
 
 	private static ComputerVision cv = ComputerVision.getInstance();
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
+	private  LocalSaver saver;
+	public final int MIDDLE_OFFSET_Y = 10;
 
-    public final int MIDDLE_OFFSET_Y = 10;
+//    private static TextSegmentation textSeg = new TextSegmentation();
+//    public static TextSegmentation getInstance() { return textSeg; }
 
-    private static TextSegmentation textSeg = new TextSegmentation();
-    public static TextSegmentation getInstance() { return textSeg; }
-    private TextSegmentation() { }
-    
-    public List<Mat> erodeImages(List<Mat> images) {
-    	int size = images.size();
-    	Mat temp;
-    	List<Mat> adjImages = new ArrayList<>();
-    	for(int i = 0; i < size; i++) {
-    		temp = images.get(i);
-    		cv.invert(temp);
+	public TextSegmentation(LocalSaver directory) {
+		this.saver = directory;
+	}
+
+	public List<Mat> erodeImages(List<Mat> images) {
+		int size = images.size();
+		Mat temp;
+		List<Mat> adjImages = new ArrayList<>();
+		for(int i = 0; i < size; i++) {
+			temp = images.get(i);
+			cv.invert(temp);
 			cv.morph(temp, Imgproc.MORPH_ERODE, Imgproc.MORPH_RECT, 5);
 			adjImages.add(temp);
-    	}
-    	return adjImages;
-    }
+		}
+		return adjImages;
+	}
 
-    public List<Mat> dilateImages(List<Mat> images) {
-    	int size = images.size();
-    	Mat temp;
-    	List<Mat> adjImages = new ArrayList<>();
-    	for(int i = 0; i < size; i++) {
-    		temp = images.get(i);
+	public List<Mat> dilateImages(List<Mat> images) {
+		int size = images.size();
+		Mat temp;
+		List<Mat> adjImages = new ArrayList<>();
+		for(int i = 0; i < size; i++) {
+			temp = images.get(i);
 			cv.morph(temp, Imgproc.MORPH_DILATE, Imgproc.MORPH_RECT, 5);
 			adjImages.add(temp);
-    	}
-    	return adjImages;
-    }
+		}
+		return adjImages;
+	}
 
-    public void segment(Mat groupImage, Form form, int groupIndex) {
+	public List<List<Mat>> segment(Mat groupImage, Form form, int groupIndex) {
 		List<Object> group = form.getGroups().get(groupIndex);
 
 		List<MatOfPoint> textContours = cv.findContours(groupImage.clone(), Imgproc.RETR_EXTERNAL);
-		
+
 		textContours = filterElements(textContours, form.getElementCount()[groupIndex]);
 		List<Mat> textImages = getImages(groupImage, textContours);
-		
+
 		List<MatOfPoint> letterContours;
 		Mat textImage, textImageInv, temp;
 		int letterCount;
-		
+
 		int size = textImages.size();
+
+		List<List<Mat>> finalImages = new ArrayList<>();
+
+		String textSegName = "text_seg_out";
+		File folder = new File(textSegName);
+		folder.mkdir();
+
 		for(int textIndex = 0; textIndex < size; textIndex++) {
 			letterCount = ((Text)group.get(textIndex)).getLetterCount();
 			textImage = textImages.get(textIndex).clone();
 			textImageInv = textImage.clone();
 
-    		cv.invert(textImageInv);
+			cv.invert(textImageInv);
 			cv.morph(textImageInv, Imgproc.MORPH_ERODE, Imgproc.MORPH_RECT, 5);
 			letterContours = cv.findContours(textImageInv.clone(), Imgproc.RETR_EXTERNAL);
-			letterContours = filterMidYContours(letterContours, letterCount, textImage.rows()/2, textImage, "_" + groupIndex + "_" + textIndex);	
+			letterContours = filterMidYContours(letterContours, letterCount, textImage.rows()/2, textImage, "_" + groupIndex + "_" + textIndex);
 			temp = redrawContours(letterContours, textImage.rows(), textImage.cols());
 			cv.morph(temp, Imgproc.MORPH_DILATE, Imgproc.MORPH_RECT, 5);
-	    	letterContours = cv.findContours(temp, Imgproc.RETR_EXTERNAL);
-	    	letterContours = filterElements(letterContours, letterCount);
-	    	List<Mat> letterImages = filter.borderRemoval(letterContours, textImage, false);
-	    	letterImages = cleanImages(letterImages);
+			letterContours = cv.findContours(temp, Imgproc.RETR_EXTERNAL);
+			letterContours = filterElements(letterContours, letterCount);
+			List<Mat> letterImages = filter.borderRemoval(letterContours, textImage, false);
+			letterImages = cleanImages(letterImages);
 
-	    	String textSegName = "text_seg_out";
-	    	File folder = new File(textSegName);
-	    	folder.mkdir();
-	    	String folderName = textSegName + File.separator + groupIndex + "_" + textIndex;
-	    	folder = new File(folderName);
-	    	folder.mkdir();
-	    	
-	    	for(int i = 0; i < letterImages.size(); i++) {
-	    		Imgcodecs.imwrite(folderName + File.separator + i + ".png", letterImages.get(i));
-	    		saveImage(folderName, letterImages.get(i));
-	    	}
+			finalImages.add(letterImages);
+			String folderName = textSegName + File.separator + groupIndex + "_" + textIndex;
+			//folder = new File(folderName);
+			//folder.mkdir();
+
+			for(int i = 0; i < letterImages.size(); i++) {
+//				Imgcodecs.imwrite(folderName + File.separator + i + ".png", letterImages.get(i));
+				this.saver.saveImage(folderName,""+i, letterImages.get(i));
+				//this.saver.saveImage(folderName + File.separator + i, letterImages.get(i));
+				//saveImage2(folderName + File.separator + i, letterImages.get(i));
+				Log.d(HomeActivity.TAG, "folder: "+folderName);
+			}
 		}
-    }
-    
-    public List<Mat> cleanImages(List<Mat> letterImages) {
-    	int size = letterImages.size();
-    	for(int i = 0; i < size; i++) {
-    		cv.morph(letterImages.get(i), Imgproc.MORPH_OPEN, Imgproc.MORPH_ELLIPSE, 3);
-    		cv.morph(letterImages.get(i), Imgproc.MORPH_CLOSE, Imgproc.MORPH_ELLIPSE, 3);
-    	}
-    	return letterImages;
-    }
-    
-    public Mat redrawContours(List<MatOfPoint> letterContours, int rows, int cols) {
-    	Scalar white = new Scalar(255);
-    	int size = letterContours.size();
+
+		return finalImages;
+	}
+
+	public void saveImage2(String filename,Mat m){
+
+		Bitmap bp = ComputerVisionUtility.convertToBitmap(m);
+		FileOutputStream out = null;
+		try {
+
+			File image = new File(filename+".jpg");
+			image.createNewFile();
+
+			out = new FileOutputStream(image);
+			bp.compress(Bitmap.CompressFormat.PNG, 100, out);
+			// bmp is your Bitmap instance
+			// PNG is a lossless format, the compression factor (100) is ignored
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	public List<Mat> cleanImages(List<Mat> letterImages) {
+		int size = letterImages.size();
+		for(int i = 0; i < size; i++) {
+			cv.morph(letterImages.get(i), Imgproc.MORPH_OPEN, Imgproc.MORPH_ELLIPSE, 3);
+			cv.morph(letterImages.get(i), Imgproc.MORPH_CLOSE, Imgproc.MORPH_ELLIPSE, 3);
+		}
+		return letterImages;
+	}
+
+	public Mat redrawContours(List<MatOfPoint> letterContours, int rows, int cols) {
+		Scalar white = new Scalar(255);
+		int size = letterContours.size();
 		Mat drawnMat = Mat.zeros(rows, cols, CvType.CV_8UC1);
-		
-    	for(int i = 0; i < size; i++)
-    		Imgproc.drawContours(drawnMat, letterContours, i, white);
-    	
-    	return drawnMat;
-    	
-    }
-    
-    public List<MatOfPoint> filterTextboxes(List<MatOfPoint> contours, int elementCount) {
-    	List<MatOfPoint> contours2 = new ArrayList<>(contours);
-    	contours2 = getLargestContours(contours2, elementCount);
-    	contours2 = sort.contourPositions(contours2);
-    	
-     	return contours2;
-    }
 
-    public List<MatOfPoint> segmentLetterboxes(List<MatOfPoint> contours, int elementCount) {
-    	List<MatOfPoint> contours2 = new ArrayList<>(contours);
-    	contours2 = getLargestContours(contours2, elementCount);
-    	contours2 = sort.contourPositions(contours2);
-    	return contours2;
-    }
+		for(int i = 0; i < size; i++)
+			Imgproc.drawContours(drawnMat, letterContours, i, white);
 
-    public List<MatOfPoint> filterElements(List<MatOfPoint> contours, int elementCount) {
-    	List<MatOfPoint> contours2 = new ArrayList<>(contours);
-    	contours = sort.contourAreas(contours, sort.ORDER_DESC);
-    	contours2 = contours.subList(0, elementCount);
-    	contours2 = sort.contourPositions(contours2);
-    	return contours2;
-    }
-    
-    public List<MatOfPoint> getLargestContours(List<MatOfPoint> contours, int elementCount) {
-    	contours = sort.contourAreas(contours, sort.ORDER_DESC);
-    	return contours.subList(0, elementCount);
-    }
-    
-    public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
-    	List<Mat> elements = new ArrayList<>();
-    	int size = elementContours.size();
-    	for(int i = 0; i < size; i++) {
-    		elements.add(getSubImage(image, elementContours.get(i)));
-    	}
-    	return elements;
-    }
+		return drawnMat;
 
-    public Mat getSubImage(Mat image, MatOfPoint contour) {
-    	Rect contourRect = Imgproc.boundingRect(contour);
-    	return image.submat(contourRect);
-    }
-    
-    public List<MatOfPoint> filterMidYContours(List<MatOfPoint> contours, int elementCount, int midY, Mat subImage, String name) {
-    	List<MatOfPoint> contours2 = new ArrayList<>();
-    	Rect rect;
-    	int size = contours.size();
-    	int lowerBound = midY - MIDDLE_OFFSET_Y;
-    	int upperBound = midY + MIDDLE_OFFSET_Y;
-    	int mid;
+	}
 
-    	Mat newMat = Mat.zeros(subImage.rows(), subImage.cols(), CvType.CV_8UC3);
-    	Imgproc.line(newMat, new Point(0, midY), new Point(newMat.width(), midY), new Scalar(0, 255, 0));
-    	Imgproc.line(newMat, new Point(0, lowerBound), new Point(newMat.width(), lowerBound), new Scalar(255, 255, 0));
-    	Imgproc.line(newMat, new Point(0, upperBound), new Point(newMat.width(), upperBound), new Scalar(255, 255, 0));
-    	
-    	for(int i = 0; i < size; i++) {
-    		rect = Imgproc.boundingRect(contours.get(i));
-    		mid = (int) ( rect.y + (rect.height / 2) );
-    		int mid1 = (int) ( rect.x + (rect.width / 2) );
-    		int mid2 = (int) ( rect.y + (rect.height / 2) );
-    		if(mid >= lowerBound && mid <= upperBound)
-    			contours2.add(contours.get(i));
-    		else {
+	public List<MatOfPoint> filterTextboxes(List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours2 = getLargestContours(contours2, elementCount);
+		contours2 = sort.contourPositions(contours2);
+
+		return contours2;
+	}
+
+	public List<MatOfPoint> segmentLetterboxes(List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours2 = getLargestContours(contours2, elementCount);
+		contours2 = sort.contourPositions(contours2);
+		return contours2;
+	}
+
+	public List<MatOfPoint> filterElements(List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours = sort.contourAreas(contours, sort.ORDER_DESC);
+		contours2 = contours.subList(0, elementCount);
+		contours2 = sort.contourPositions(contours2);
+		return contours2;
+	}
+
+	public List<MatOfPoint> getLargestContours(List<MatOfPoint> contours, int elementCount) {
+		contours = sort.contourAreas(contours, sort.ORDER_DESC);
+		return contours.subList(0, elementCount);
+	}
+
+	public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
+		List<Mat> elements = new ArrayList<>();
+		int size = elementContours.size();
+		for(int i = 0; i < size; i++) {
+			elements.add(getSubImage(image, elementContours.get(i)));
+		}
+		return elements;
+	}
+
+	public Mat getSubImage(Mat image, MatOfPoint contour) {
+		Rect contourRect = Imgproc.boundingRect(contour);
+		return image.submat(contourRect);
+	}
+
+	public List<MatOfPoint> filterMidYContours(List<MatOfPoint> contours, int elementCount, int midY, Mat subImage, String name) {
+		List<MatOfPoint> contours2 = new ArrayList<>();
+		Rect rect;
+		int size = contours.size();
+		int lowerBound = midY - MIDDLE_OFFSET_Y;
+		int upperBound = midY + MIDDLE_OFFSET_Y;
+		int mid;
+
+		Mat newMat = Mat.zeros(subImage.rows(), subImage.cols(), CvType.CV_8UC3);
+		Imgproc.line(newMat, new Point(0, midY), new Point(newMat.width(), midY), new Scalar(0, 255, 0));
+		Imgproc.line(newMat, new Point(0, lowerBound), new Point(newMat.width(), lowerBound), new Scalar(255, 255, 0));
+		Imgproc.line(newMat, new Point(0, upperBound), new Point(newMat.width(), upperBound), new Scalar(255, 255, 0));
+
+		for(int i = 0; i < size; i++) {
+			rect = Imgproc.boundingRect(contours.get(i));
+			mid = (int) ( rect.y + (rect.height / 2) );
+			int mid1 = (int) ( rect.x + (rect.width / 2) );
+			int mid2 = (int) ( rect.y + (rect.height / 2) );
+			if(mid >= lowerBound && mid <= upperBound)
+				contours2.add(contours.get(i));
+			else {
 //    			System.out.println(" ---> " + midY);
 //    			System.out.println(" ---< " + mid);
-    		}
-        	Imgproc.circle(newMat, new Point(mid1, mid2), 5, new Scalar(255, 255, 255));
+			}
+			Imgproc.circle(newMat, new Point(mid1, mid2), 5, new Scalar(255, 255, 255));
 
-    	}
+		}
 //    	Imgcodecs.imwrite(name + ".png", newMat);
-    	return contours2;
-    }
-    
+		return contours2;
+	}
+
 }
