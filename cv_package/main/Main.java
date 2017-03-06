@@ -20,7 +20,7 @@ public class Main {
 		Mat image = Imgcodecs.imread("input"+File.separator+"x1.jpg");
 		Form form = new FormPatientInfo();
 		form.setImage(image);
-		Segmentation s = Segmentation.getInstance();
+		//Segmentation s = Segmentation.getInstance();
 		//s.segment(form);
 		System.out.println("[END]");
 	}

@@ -16,23 +16,24 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import cv_package.filesaving.LocalSaver;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.HierarchyHandler;
 import cv_package.helpers.Sorting;
 
-public class OpticalMarkSegmentation extends ImageSaver {
+public class OpticalMarkSegmentation {
 
 
 
 	
 	public static ComputerVision cv = ComputerVision.getInstance();
 	//public static OpticalMarkSegmentation markSegmenter = new OpticalMarkSegmentation();
+	private LocalSaver saver;
 
 
-
-	public OpticalMarkSegmentation(File directory) {
-		super(directory);
+	public OpticalMarkSegmentation(LocalSaver saver) {
+		this.saver = saver;
 	}
 
 	//public static OpticalMarkSegmentation getInstance(){return markSegmenter;}
@@ -43,8 +44,7 @@ public class OpticalMarkSegmentation extends ImageSaver {
 	
 	public int[] recognize(Mat box,int numChoices,int i){
 
-
-		saveImage("Box"+i, box);
+		saver.saveImage("Box" + i, box);
 		/*
 		int answerValues[] = new int[numChoices];
 

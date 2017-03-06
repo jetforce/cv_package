@@ -41,7 +41,9 @@ public class FormPatientInfo extends Form {
     String maintenanceMed;
     
     public FormPatientInfo() {
-    	
+    	super();
+		answers = new Answer[7];
+
     	this.guideCount = 6;
     	int[] guideMatch = {1, 2, 3, 4, 5, 5, 6};
     	this.setGuideMatch(guideMatch);
@@ -49,7 +51,7 @@ public class FormPatientInfo extends Form {
     	int[] fieldTypes = {1, 1, 3, 3, 2, 2, 3};
     	this.setGroupTypes(fieldTypes);
     	this.totalContours = guideCount + getGroupCount();
-    	int[] elementCount = {3, 9, 1, 1, 8, 9, 1};
+    	int[] elementCount = {3, 9, 1, 1, 7, 8, 1};
     	this.setElementCount(elementCount);
 
     	basicDetails = new ArrayList<>();
@@ -67,6 +69,8 @@ public class FormPatientInfo extends Form {
     	patientDetails.add(new Text("Address", 27));
     	patientDetails.add(new Text("Cellphone Number", 11));
     	patientDetails.add(new Text("Guardian Name", 25));
+
+
     	
     	this.setGroups();
     	this.addGroup(basicDetails);
