@@ -6,6 +6,6 @@ package cv_package.helpers;
 
 public class Timer {
 
-    
+
 
 }

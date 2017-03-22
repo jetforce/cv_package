@@ -1,5 +1,4 @@
 package cv_package.segmentation;
-import android.util.Log;
 
 //import com.virtusio.sibayan.test.ComputerVision;
 
@@ -29,7 +28,7 @@ import cv_package.forms.TextAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
-
+import cv_package.localadapters.LocalPrinter;
 
 
 public class Segmentation {
@@ -44,6 +43,8 @@ public class Segmentation {
 	private static OpticalMarkSegmentation markSeg;
 
 	private LocalSaver saver;
+	private LocalPrinter printer;
+
 
 	// Field Type Variables
 	private final int FIELDTYPE_TEXT = 1;
@@ -57,38 +58,36 @@ public class Segmentation {
 //    Mat binaryImage;
 
 
-
-	public Segmentation(LocalSaver saver) {
+	public Segmentation(LocalSaver saver,LocalPrinter printer ) {
 		this.saver = saver;
+		this.printer = printer;
 	}
-
-
 
 	public void segment(Form form) {
 		textSeg = new TextSegmentation(saver);
 		markSeg = new OpticalMarkSegmentation(saver);
+		printer.print("HANNAH > ", "1");
 
-		Log.i("HANNAH > ", "1");
 		List<MatOfPoint> groupContours;
 		Mat paperImage = form.getImage();
+		printer.print("HANNAH > ", "2");
 
-		Log.i("HANNAH > ", "2");
 
 		// PREPROCESS
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
 		//Imgcodecs.imwrite("test.png", paperImage);
 
-		Log.i("HANNAH > ", "3");
+		printer.print("HANNAH > ", "3");
 
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
 		groupContours = filterGroups(groupContours, form.getGroupCount());
 
-		Log.i("HANNAH > ", "4");
+		printer.print("HANNAH > ", "4");
 
 		int[] groupTypes = form.getGroupTypes();
 
-		System.out.println("[OK] SEGMENTATION: Major Groups Good");
+		printer.print("HANNAH > ", "Ok major segments done");
 
 		Mat sampleImage = paperImage.clone();
 		cv.invert(sampleImage);
@@ -112,7 +111,7 @@ public class Segmentation {
 				case FIELDTYPE_BLOB:
 					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
 			}
-			Log.i("HANNAH > ", "done " + i);
+			printer.print("HANNAH > ", "group done "+i);
 		}
 		//return form;
 	}

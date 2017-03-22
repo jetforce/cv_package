@@ -1,7 +1,7 @@
 package cv_package.segmentation;
 
-import android.graphics.Bitmap;
-import android.util.Log;
+//import android.graphics.Bitmap;
+//import android.util.Log;
 
 import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
 import com.virtusio.sibayan.image_process.helpers.ImageSaver;
@@ -118,39 +118,13 @@ public class TextSegmentation{
 				this.saver.saveImage(folderName,""+i, letterImages.get(i));
 				//this.saver.saveImage(folderName + File.separator + i, letterImages.get(i));
 				//saveImage2(folderName + File.separator + i, letterImages.get(i));
-				Log.d(HomeActivity.TAG, "folder: "+folderName);
+				//Log.d(HomeActivity.TAG, "folder: "+folderName);
 			}
 		}
 
 		return finalImages;
 	}
 
-	public void saveImage2(String filename,Mat m){
-
-		Bitmap bp = ComputerVisionUtility.convertToBitmap(m);
-		FileOutputStream out = null;
-		try {
-
-			File image = new File(filename+".jpg");
-			image.createNewFile();
-
-			out = new FileOutputStream(image);
-			bp.compress(Bitmap.CompressFormat.PNG, 100, out);
-			// bmp is your Bitmap instance
-			// PNG is a lossless format, the compression factor (100) is ignored
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (out != null) {
-					out.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
 
 	public List<Mat> cleanImages(List<Mat> letterImages) {
 		int size = letterImages.size();
