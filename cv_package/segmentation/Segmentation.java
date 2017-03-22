@@ -18,9 +18,11 @@ import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import cv_package.debug.LocalPrinter;
+import cv_package.debug.LocalSaver;
+import cv_package.debug.Timer;
 import cv_package.fields.Text;
 import cv_package.filesaving.FileSave;
-import cv_package.filesaving.LocalSaver;
 import cv_package.forms.BlobAnswer;
 import cv_package.forms.Form;
 import cv_package.forms.MarkAnswer;
@@ -28,7 +30,6 @@ import cv_package.forms.TextAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
-import cv_package.localadapters.LocalPrinter;
 
 
 public class Segmentation {
@@ -66,18 +67,23 @@ public class Segmentation {
 	public void segment(Form form) {
 		textSeg = new TextSegmentation(saver);
 		markSeg = new OpticalMarkSegmentation(saver);
+		
+		Timer t = Timer.getInstance();
+		t.start();
+		
 		printer.print("HANNAH > ", "1");
 
 		List<MatOfPoint> groupContours;
 		Mat paperImage = form.getImage();
 		printer.print("HANNAH > ", "2");
 
-
+		
 		// PREPROCESS
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
 		//Imgcodecs.imwrite("test.png", paperImage);
-
+		t.stop();
+		t.start();
 		printer.print("HANNAH > ", "3");
 
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
@@ -96,8 +102,10 @@ public class Segmentation {
 
 		int size = groupImages.size();
 		int[] temp;
+		t.stop();
+		
 		for(int i = 0; i < size; i++) {
-
+			t.start();
 			switch(groupTypes[i]) {
 				case FIELDTYPE_TEXT:
 					List<List<Mat>> images = textSeg.segment(groupImages.get(i).clone(), form, i);
@@ -111,7 +119,9 @@ public class Segmentation {
 				case FIELDTYPE_BLOB:
 					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
 			}
+			t.stop();
 			printer.print("HANNAH > ", "group done "+i);
+			
 		}
 		//return form;
 	}

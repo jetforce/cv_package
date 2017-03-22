@@ -20,9 +20,9 @@ import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import cv_package.debug.LocalSaver;
 import cv_package.fields.Text;
 import cv_package.filesaving.FileSave;
-import cv_package.filesaving.LocalSaver;
 import cv_package.forms.Form;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;

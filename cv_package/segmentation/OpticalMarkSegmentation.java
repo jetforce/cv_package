@@ -12,7 +12,7 @@ import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
-import cv_package.filesaving.LocalSaver;
+import cv_package.debug.LocalSaver;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.HierarchyHandler;

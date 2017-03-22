@@ -7,12 +7,12 @@ import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
+import cv_package.debug.Printer;
+import cv_package.debug.Saver;
 import cv_package.fields.Text;
-import cv_package.filesaving.Saver;
 import cv_package.forms.Form;
 import cv_package.forms.FormMarks;
 import cv_package.forms.FormPatientInfo;
-import cv_package.helpers.Printer;
 import cv_package.segmentation.Segmentation;
 import cv_package.segmentation.FourSquareCorner;
 

@@ -1,6 +1,4 @@
-package cv_package.helpers;
-
-import cv_package.localadapters.LocalPrinter;
+package cv_package.debug;
 
 public class Printer implements LocalPrinter {
 

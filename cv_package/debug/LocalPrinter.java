@@ -1,4 +1,4 @@
-package cv_package.localadapters;
+package cv_package.debug;
 
 /**
  * Created by jet on 3/22/2017.
