@@ -54,7 +54,7 @@ public class FourSquareCorner {
 		Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255,255), 8);
 		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0,255), 8);
 		Imgproc.circle(original, points.get(3) , 10, new Scalar(255,0,0,255), 8);
-		
+
 		Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0,255),8);
 		Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255,255),8);
 		Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0,255),8);

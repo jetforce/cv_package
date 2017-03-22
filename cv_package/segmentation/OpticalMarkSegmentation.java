@@ -1,10 +1,6 @@
 package cv_package.segmentation;
 
 
-
-import com.virtusio.sibayan.image_process.helpers.ImageSaver;
-import com.virtusio.sibayan.thesis.activities.HomeActivity;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

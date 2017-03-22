@@ -3,9 +3,6 @@ package cv_package.segmentation;
 //import android.graphics.Bitmap;
 //import android.util.Log;
 
-import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
-import com.virtusio.sibayan.image_process.helpers.ImageSaver;
-import com.virtusio.sibayan.thesis.activities.HomeActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
