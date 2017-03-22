@@ -16,6 +16,7 @@ public abstract class Answer {
         this.type = type;
     }
     public abstract Object getAnswer();
+    public abstract Object getResult();
     public int getType(){
         return this.type;
     }

@@ -7,6 +7,8 @@ import org.opencv.core.MatOfPoint;
 
 public class Form {
 
+	int form_id;
+
 	// Image
 
 	public Answer[] answers;
@@ -88,6 +90,10 @@ public class Form {
 
 	public void setAnswer(int index, Answer ans){
 		this.answers[index] = ans;
+	}
+
+	public int getFormId() {
+		return form_id;
 	}
 
 }

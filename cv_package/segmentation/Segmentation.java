@@ -1,7 +1,9 @@
 package cv_package.segmentation;
-//import android.util.Log;
+import android.util.Log;
 
+//import com.virtusio.sibayan.test.ComputerVision;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -27,7 +29,8 @@ import cv_package.forms.TextAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
-import cv_package.localadapters.LocalPrinter;
+
+
 
 public class Segmentation {
 
@@ -41,7 +44,6 @@ public class Segmentation {
 	private static OpticalMarkSegmentation markSeg;
 
 	private LocalSaver saver;
-	private LocalPrinter printer;
 
 	// Field Type Variables
 	private final int FIELDTYPE_TEXT = 1;
@@ -56,9 +58,8 @@ public class Segmentation {
 
 
 
-	public Segmentation(LocalSaver saver,LocalPrinter printer) {
+	public Segmentation(LocalSaver saver) {
 		this.saver = saver;
-		this.printer = printer;
 	}
 
 
@@ -67,25 +68,23 @@ public class Segmentation {
 		textSeg = new TextSegmentation(saver);
 		markSeg = new OpticalMarkSegmentation(saver);
 
-
-		printer.print("HANNAH > ", "1");
-
+		Log.i("HANNAH > ", "1");
 		List<MatOfPoint> groupContours;
 		Mat paperImage = form.getImage();
-		printer.print("HANNAH > ", "2");
 
+		Log.i("HANNAH > ", "2");
 
 		// PREPROCESS
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
 		//Imgcodecs.imwrite("test.png", paperImage);
-		printer.print("HANNAH > ", "3");
 
+		Log.i("HANNAH > ", "3");
 
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
 		groupContours = filterGroups(groupContours, form.getGroupCount());
-		printer.print("HANNAH > ", "4");
 
+		Log.i("HANNAH > ", "4");
 
 		int[] groupTypes = form.getGroupTypes();
 
@@ -113,7 +112,7 @@ public class Segmentation {
 				case FIELDTYPE_BLOB:
 					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
 			}
-			printer.print("HANNAH > ", "Done 5");
+			Log.i("HANNAH > ", "done " + i);
 		}
 		//return form;
 	}

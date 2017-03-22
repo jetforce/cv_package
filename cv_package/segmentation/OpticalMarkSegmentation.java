@@ -1,4 +1,7 @@
 package cv_package.segmentation;
+
+import android.util.Log;
+
 import com.virtusio.sibayan.image_process.helpers.ImageSaver;
 import com.virtusio.sibayan.thesis.activities.HomeActivity;
 
@@ -149,6 +152,7 @@ public class OpticalMarkSegmentation {
 			roi = new Mat(box,rect);
 			value = countWhite(roi);
 			answerValues[x] = value;
+			Log.d(HomeActivity.TAG,"SIZE box num "+i+ " " +countWhite(roi));
 			//answerValues[x] = countWhite(roi);
 			//System.out.println("Choice "+x+" ,"+countWhite(roi));
 			//Imgproc.rectangle(box, rect.tl(), rect.br(), new Scalar(255,255,255),-1);

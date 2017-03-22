@@ -1,17 +1,13 @@
 package cv_package.forms;
-import java.util.ArrayList;
+
 import java.util.List;
-
-import org.opencv.core.MatOfPoint;
-
-import cv_package.fields.Text;
 
 /**
  * Created by Hannah on 2/13/2017.
  */
 
 public class FormPatientInfo extends Form {
-	
+
     // Basic Details
 	List<Object> basicDetails;
 
@@ -43,38 +39,39 @@ public class FormPatientInfo extends Form {
     public FormPatientInfo() {
     	super();
 		answers = new Answer[7];
+		form_id = 0;
 
-    	this.guideCount = 6;
-    	int[] guideMatch = {1, 2, 3, 4, 5, 5, 6};
-    	this.setGuideMatch(guideMatch);
-    	this.setGroupCount(7);
-    	int[] fieldTypes = {1, 1, 3, 3, 2, 2, 3};
-    	this.setGroupTypes(fieldTypes);
-    	this.totalContours = guideCount + getGroupCount();
-    	int[] elementCount = {3, 9, 1, 1, 7, 8, 1};
-    	this.setElementCount(elementCount);
+//    	this.guideCount = 6;
+//    	int[] guideMatch = {1, 2, 3, 4, 5, 5, 6};
+//    	this.setGuideMatch(guideMatch);
+//    	this.setGroupCount(7);
+//    	int[] fieldTypes = {1, 1, 3, 3, 2, 2, 3};
+//    	this.setGroupTypes(fieldTypes);
+//    	this.totalContours = guideCount + getGroupCount();
+//    	int[] elementCount = {3, 9, 1, 1, 7, 8, 1};
+//    	this.setElementCount(elementCount);
 
-    	basicDetails = new ArrayList<>();
-    	basicDetails.add(new Text("Health Center", 6));
-    	basicDetails.add(new Text("Healthcare Personnel ID", 12));
-    	basicDetails.add(new Text("Date", 6));
-
-    	patientDetails = new ArrayList<>();
-    	patientDetails.add(new Text("Patient Name", 25));
-    	patientDetails.add(new Text("PhilHealth Number", 14));
-    	patientDetails.add(new Text("Date of Birth", 6));
-    	patientDetails.add(new Text("Gender", 1));
-    	patientDetails.add(new Text("Marital Status", 1));
-    	patientDetails.add(new Text("Blood Type", 3));
-    	patientDetails.add(new Text("Address", 27));
-    	patientDetails.add(new Text("Cellphone Number", 11));
-    	patientDetails.add(new Text("Guardian Name", 25));
-
-
-    	
-    	this.setGroups();
-    	this.addGroup(basicDetails);
-    	this.addGroup(patientDetails);
+//    	basicDetails = new ArrayList<>();
+//    	basicDetails.add(new Text("Health Center", 6));
+//    	basicDetails.add(new Text("Healthcare Personnel ID", 12));
+//    	basicDetails.add(new Text("Date", 6));
+//
+//    	patientDetails = new ArrayList<>();
+//    	patientDetails.add(new Text("Patient Name", 25));
+//    	patientDetails.add(new Text("PhilHealth Number", 14));
+//    	patientDetails.add(new Text("Date of Birth", 6));
+//    	patientDetails.add(new Text("Gender", 1));
+//    	patientDetails.add(new Text("Marital Status", 1));
+//    	patientDetails.add(new Text("Blood Type", 3));
+//    	patientDetails.add(new Text("Address", 27));
+//    	patientDetails.add(new Text("Cellphone Number", 11));
+//    	patientDetails.add(new Text("Guardian Name", 25));
+//
+//
+//
+//    	this.setGroups();
+//    	this.addGroup(basicDetails);
+//    	this.addGroup(patientDetails);
     	
     }
 
