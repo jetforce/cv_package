@@ -30,6 +30,7 @@ import cv_package.forms.TextAnswer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
+import cv_package.paperextractorv2.FourCornerBoxv2;
 
 
 public class Segmentation {
@@ -65,11 +66,18 @@ public class Segmentation {
 	}
 
 	public void segment(Form form) {
+
+		//Extract paper here;
+		FourCornerBoxv2 extract = new FourCornerBoxv2(this.saver,this.printer);
+		form.setImage(extract.extractPaper(form.getImage()));
+
+
+
 		textSeg = new TextSegmentation(saver);
 		markSeg = new OpticalMarkSegmentation(saver);
 		
-		Timer t = Timer.getInstance();
-		t.start();
+		//Timer t = Timer.getInstance();
+		//t.start();
 		
 		printer.print("HANNAH > ", "1");
 
@@ -82,8 +90,8 @@ public class Segmentation {
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
 		//Imgcodecs.imwrite("test.png", paperImage);
-		t.stop();
-		t.start();
+		//t.stop();
+		//t.start();
 		printer.print("HANNAH > ", "3");
 
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);
@@ -102,10 +110,10 @@ public class Segmentation {
 
 		int size = groupImages.size();
 		int[] temp;
-		t.stop();
+		//t.stop();
 		
 		for(int i = 0; i < size; i++) {
-			t.start();
+			//t.start();
 			switch(groupTypes[i]) {
 				case FIELDTYPE_TEXT:
 					List<List<Mat>> images = textSeg.segment(groupImages.get(i).clone(), form, i);
@@ -119,7 +127,7 @@ public class Segmentation {
 				case FIELDTYPE_BLOB:
 					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
 			}
-			t.stop();
+			//t.stop();
 			printer.print("HANNAH > ", "group done "+i);
 			
 		}

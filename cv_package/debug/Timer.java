@@ -20,7 +20,7 @@ public class Timer {
 	
 	
 	public void start(){
-		start =  System.currentTimeMillis()();
+		start =  System.currentTimeMillis();
 	}
 	
 	
