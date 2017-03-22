@@ -1,7 +1,4 @@
 package cv_package.segmentation;
-
-import android.util.Log;
-
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
@@ -56,13 +53,7 @@ public class FourSquareCorner {
 		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0,255), 8);
 		Imgproc.circle(original, points.get(3) , 10, new Scalar(255,0,0,255), 8);
 
-
-
-		Log.d(TAG,"areas of box 1 :"+Imgproc.contourArea(cornerBoxes.get(0)));
-		Log.d(TAG,"areas of box 2 :"+Imgproc.contourArea(cornerBoxes.get(1)));
-		Log.d(TAG,"areas of box 3 :"+Imgproc.contourArea(cornerBoxes.get(2)));
-		Log.d(TAG,"areas of box 4 :"+Imgproc.contourArea(cornerBoxes.get(3)));
-
+		
 		Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0,255),8);
 		Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255,255),8);
 		Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0,255),8);
