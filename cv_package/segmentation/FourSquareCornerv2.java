@@ -1,8 +1,5 @@
 package cv_package.segmentation;
 
-
-
-import org.opencv.core.Mat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +11,17 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
 
-public class FourSquareCorner {
-
+public class FourSquareCornerv2 {
+	//this is created as a better version of v1
+	//uses mid as basis for looking for the nearest
+	
+	
 	public static String TAG="FOURSQUARECORNER";
 	Filtering filter = Filtering.getInstance();
 	Sorting sort = Sorting.getInstance();
@@ -51,7 +52,7 @@ public class FourSquareCorner {
 		points.add(getTL(cornerBoxes.get(3)));
 		
 		Mat normalized = getFourpointTransform(points, original);
-
+		
 		Imgproc.circle(original, points.get(0) , 10, new Scalar(0,0,0,255), 8);
 		Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255,255), 8);
 		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0,255), 8);
@@ -102,19 +103,19 @@ public class FourSquareCorner {
 		
 		do{
 			tempCont = squareConts.get(i);
-			if(computeDistance(tlPoint, getTL(tempCont)) < computeDistance(tlPoint, getTL(squareConts.get(tlIndex)))){
+			if(computeDistance(tlPoint, getMid(tempCont)) < computeDistance(tlPoint, getMid(squareConts.get(tlIndex)))){
 				tlIndex = i;
 			}
 			
-			if(computeDistance(trPoint, getTR(tempCont)) < computeDistance(trPoint, getTR(squareConts.get(trIndex)))){
+			if(computeDistance(trPoint, getMid(tempCont)) < computeDistance(trPoint, getMid(squareConts.get(trIndex)))){
 				trIndex = i;
 			}
 			
-			if(computeDistance(brPoint, getBR(tempCont)) < computeDistance(brPoint, getBR(squareConts.get(brIndex)))){
+			if(computeDistance(brPoint, getMid(tempCont)) < computeDistance(brPoint, getMid(squareConts.get(brIndex)))){
 				brIndex = i;
 			}
 			
-			if(computeDistance(blPoint, getBL(tempCont)) < computeDistance(blPoint, getBL(squareConts.get(blIndex)))){
+			if(computeDistance(blPoint, getMid(tempCont)) < computeDistance(blPoint, getMid(squareConts.get(blIndex)))){
 				blIndex = i;
 			}
 			
@@ -145,6 +146,15 @@ public class FourSquareCorner {
 		return cornerSquares;
 	}
 	
+	
+	
+	public Point getMid(MatOfPoint cont){
+		Moments moments = Imgproc.moments(cont);
+		Point centroid = new Point();
+		centroid.x = moments.get_m10() / moments.get_m00();
+		centroid.y = moments.get_m01() / moments.get_m00();
+		return centroid; 
+	}
 	
 	public Point getTL(MatOfPoint cont){
 		Rect rect = Imgproc.boundingRect(cont);
@@ -205,4 +215,7 @@ public class FourSquareCorner {
     }
     
     
+	
+	
+	
 }

@@ -70,6 +70,8 @@ public class ComputerVision {
         ArrayList<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(image, contours, new Mat(), Imgproc.RETR_LIST,Imgproc.CHAIN_APPROX_SIMPLE);
         ArrayList<MatOfPoint> squares = new ArrayList<>();
+        
+       
         for(int i=0; i< contours.size();i++){
             if (Imgproc.contourArea(contours.get(i)) > size){
                     temp = this.getSquareApprox(contours.get(i));

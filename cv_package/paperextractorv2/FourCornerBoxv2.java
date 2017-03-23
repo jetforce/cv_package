@@ -1,20 +1,13 @@
 package cv_package.paperextractorv2;
 
 
-
-import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
-
-import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
-
-import java.io.File;
-
 import cv_package.debug.LocalPrinter;
 import cv_package.debug.LocalSaver;
-import cv_package.debug.Timer;
 import cv_package.segmentation.FourSquareCorner;
+import cv_package.segmentation.FourSquareCornerv2;
 
 /**
  * Created by jet on 3/22/2017.
@@ -58,10 +51,10 @@ public class FourCornerBoxv2 {
 
 
         //t.start();
-        FourSquareCorner normalizer = new FourSquareCorner();
+        FourSquareCornerv2 normalizer = new FourSquareCornerv2();
         Mat paper = normalizer.Normalize(crop,false);
         //t.stop();
-
+        
         //t.start();
         //this.saver.saveImage("original",normalizer.beforeTouching);
         this.saver.saveImage("marked",normalizer.marked);

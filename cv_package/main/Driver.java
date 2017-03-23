@@ -23,19 +23,9 @@ public class Driver {
 		// TODO Auto-generated method stub
 		System.out.println("This jet main");
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		Mat image = Imgcodecs.imread("input"+File.separator+"input.jpg");
+		Mat image = Imgcodecs.imread("input"+File.separator+"badinput3.jpg");
 		
-		
-		
-		Imgcodecs.imwrite("wat.jpg", image);
-		
-		 FourSquareCorner normalizer = new FourSquareCorner();
-		 image = normalizer.Normalize(image,false);
-		 Saver sl;
-		
-		sl = new Saver();
-		sl.saveImage("jet", image);
-		
+				
 		Form form = new FormPatientInfo();
 		
 		form.setGroupCount(6);
@@ -75,7 +65,6 @@ public class Driver {
     	
     	
     	
-		
 		form.setImage(image);
 		Segmentation s = new Segmentation(new Saver(), new Printer());
 		s.segment(form);

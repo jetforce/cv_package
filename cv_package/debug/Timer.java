@@ -15,7 +15,6 @@ public class Timer {
 	
 	public Timer(){
 		times = new ArrayList<>();
-
 	}
 	
 	
