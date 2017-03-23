@@ -35,7 +35,7 @@ public class FourCornerBoxv2 {
 
     public Mat extractPaper(Mat originalBitmap) {
 
-        Timer t = Timer.getInstance();
+        //Timer t = Timer.getInstance();
 
 
         Mat rgba = originalBitmap;
@@ -57,22 +57,19 @@ public class FourCornerBoxv2 {
 
 
 
-        t.start();
+        //t.start();
         FourSquareCorner normalizer = new FourSquareCorner();
         Mat paper = normalizer.Normalize(crop,false);
-        t.stop();
+        //t.stop();
 
-        t.start();
+        //t.start();
         //this.saver.saveImage("original",normalizer.beforeTouching);
         this.saver.saveImage("marked",normalizer.marked);
-        //this.saver.saveImage("Thresh",normalizer.thresholded);
+        this.saver.saveImage("Thresh",normalizer.thresholded);
         this.saver.saveImage("normal",paper);
-        t.stop();
-
-
-
+        //t.stop();
+        
         //output = ComputerVisionUtility.convertToBitmap(paper);
-
         return paper;
 
     }

@@ -71,8 +71,6 @@ public class Segmentation {
 		FourCornerBoxv2 extract = new FourCornerBoxv2(this.saver,this.printer);
 		form.setImage(extract.extractPaper(form.getImage()));
 
-
-
 		textSeg = new TextSegmentation(saver);
 		markSeg = new OpticalMarkSegmentation(saver);
 		
@@ -110,8 +108,7 @@ public class Segmentation {
 
 		int size = groupImages.size();
 		int[] temp;
-		//t.stop();
-		
+
 		for(int i = 0; i < size; i++) {
 			//t.start();
 			switch(groupTypes[i]) {

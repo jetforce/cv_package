@@ -39,7 +39,7 @@ public class FourSquareCorner {
 		vision.threshold(paper,true);
 		thresholded = paper.clone();
 
-		ArrayList<MatOfPoint> squareConts = vision.getSquareContours(paper, 1000);
+		ArrayList<MatOfPoint> squareConts = vision.getSquareContours(paper, 700);
 		List<Point> points = new ArrayList<>();
 		List<MatOfPoint> cornerBoxes = this.getCornerBoxes(squareConts,paper.height(),paper.width());
 		
