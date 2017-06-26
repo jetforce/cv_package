@@ -159,7 +159,7 @@ public class TextSegmentation{
 		return contours2;
 	}
 
-	public List<MatOfPoint> filterElements(List<MatOfPoint> contours, int elementCount) {
+	public List<MatOfPoint> filterElements(List<MatOfPoint> contours, int elementCount) {	//
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
 		contours2 = contours.subList(0, elementCount);

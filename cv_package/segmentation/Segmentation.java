@@ -42,7 +42,7 @@ public class Segmentation {
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
 	private static TextSegmentation textSeg;
-	private static OpticalMarkSegmentation markSeg;
+	private static OpticalMarkRecognition markSeg;
 
 	private LocalSaver saver;
 	private LocalPrinter printer;
@@ -72,7 +72,7 @@ public class Segmentation {
 		form.setImage(extract.extractPaper(form.getImage()));
 
 		textSeg = new TextSegmentation(saver);
-		markSeg = new OpticalMarkSegmentation(saver);
+		markSeg = new OpticalMarkRecognition(saver);
 		
 		//Timer t = Timer.getInstance();
 		//t.start();

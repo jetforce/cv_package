@@ -18,7 +18,7 @@ import cv_package.helpers.Filtering;
 import cv_package.helpers.HierarchyHandler;
 import cv_package.helpers.Sorting;
 
-public class OpticalMarkSegmentation {
+public class OpticalMarkRecognition {
 
 
 
@@ -28,7 +28,7 @@ public class OpticalMarkSegmentation {
 	private LocalSaver saver;
 
 
-	public OpticalMarkSegmentation(LocalSaver saver) {
+	public OpticalMarkRecognition(LocalSaver saver) {
 		this.saver = saver;
 	}
 
