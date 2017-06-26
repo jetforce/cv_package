@@ -31,7 +31,7 @@ public class OpticalMarkRecognition {
 	public OpticalMarkRecognition(LocalSaver saver) {
 		this.saver = saver;
 	}
-
+	
 	//public static OpticalMarkSegmentation getInstance(){return markSegmenter;}
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();

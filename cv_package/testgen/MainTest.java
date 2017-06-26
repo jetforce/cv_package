@@ -17,7 +17,9 @@ import cv_package.helpers.Filtering;
 import cv_package.basicelem2.Form;
 
 public class MainTest {
-
+	
+	/*
+	
 	private static Filtering filter = Filtering.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
 	
@@ -137,5 +139,6 @@ public class MainTest {
 //			}
 //		}
 //	}
+	*/
 		
 }

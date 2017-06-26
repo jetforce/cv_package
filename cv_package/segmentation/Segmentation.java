@@ -27,10 +27,12 @@ import cv_package.forms.BlobAnswer;
 import cv_package.forms.Form;
 import cv_package.forms.MarkAnswer;
 import cv_package.forms.TextAnswer;
+import cv_package.helpers.BorderHandler;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
 import cv_package.paperextractorv2.FourCornerBoxv2;
+import cv_package.paperextractorv2.FourCornerBoxv3;
 
 
 public class Segmentation {
@@ -42,7 +44,11 @@ public class Segmentation {
 	private static Filtering filter = Filtering.getInstance();
 	private static FileSave fs = FileSave.getInstance();
 	private static TextSegmentation textSeg;
-	private static OpticalMarkRecognition markSeg;
+
+	//private static OpticalMarkRecognition markSeg;
+
+	private static OpticalMarkSegmentationv2 markSeg;
+
 
 	private LocalSaver saver;
 	private LocalPrinter printer;
@@ -56,40 +62,38 @@ public class Segmentation {
 	// Image Modification Variables
 	public final int BORDER_THICKNESS_PAPER = 10;
 
-	// Image
-//    Mat binaryImage;
-
-
+	
 	public Segmentation(LocalSaver saver,LocalPrinter printer ) {
 		this.saver = saver;
 		this.printer = printer;
 	}
-
+	
 	public void segment(Form form) {
 
 		//Extract paper here;
 		FourCornerBoxv2 extract = new FourCornerBoxv2(this.saver,this.printer);
 		form.setImage(extract.extractPaper(form.getImage()));
-
-		textSeg = new TextSegmentation(saver);
-		markSeg = new OpticalMarkRecognition(saver);
 		
-		//Timer t = Timer.getInstance();
-		//t.start();
+		
+		textSeg = new TextSegmentation(saver);
+
+		markSeg = new OpticalMarkSegmentationv2(saver);
+
+		
 		
 		printer.print("HANNAH > ", "1");
 
 		List<MatOfPoint> groupContours;
 		Mat paperImage = form.getImage();
 		printer.print("HANNAH > ", "2");
-
+		
 		
 		// PREPROCESS
 		//paperImage = cropBorder(paperImage, BORDER_THICKNESS_PAPER);
 		cv.preprocess(paperImage);
-		//Imgcodecs.imwrite("test.png", paperImage);
-		//t.stop();
-		//t.start();
+		
+		
+		
 		printer.print("HANNAH > ", "3");
 
 		groupContours = cv.findContours(paperImage.clone(), Imgproc.RETR_EXTERNAL);

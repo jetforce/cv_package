@@ -47,9 +47,9 @@ public class FourCornerBoxv2 {
         Rect rect = new Rect(vertex1,vertex2);
 
         Mat crop = new Mat(rgba, rect);
-
-
-
+   
+        
+        
         //t.start();
         FourSquareCornerv2 normalizer = new FourSquareCornerv2();
         Mat paper = normalizer.Normalize(crop,false);

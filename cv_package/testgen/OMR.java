@@ -32,7 +32,7 @@ public class OMR {
 	
 	private static OMR omr = new OMR();
     public static OMR getInstance() { return omr; }
-    private OMR() { }
+    OMR() { }
 	
 	public void go(Mark comp) {
 		List<Mat> mats = getMatCirclesClean(comp.image, comp.labels.size()+1);

@@ -23,8 +23,11 @@ public class Driver {
 		// TODO Auto-generated method stub
 		System.out.println("This jet main");
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		Mat image = Imgcodecs.imread("input"+File.separator+"figure1.jpg");
-		
+
+		//Mat image = Imgcodecs.imread("input"+File.separator+"figure1.jpg");
+
+		Mat image = Imgcodecs.imread("input"+File.separator+"x3.jpg");
+
 				
 		Form form = new FormPatientInfo();
 		
