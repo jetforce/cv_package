@@ -30,7 +30,7 @@ public class FourSquareCornerv2 {
 	public Mat marked;
 	public Mat thresholded;
 
-	public Mat Normalize(Mat original, Boolean isDebug){
+	public Mat Normalize(Mat original ,Boolean isDebug){
 		beforeTouching = original.clone();
 		Mat paper = original.clone();
 
@@ -82,6 +82,119 @@ public class FourSquareCornerv2 {
 	}
 	
 
+	public Mat Normalize(Mat original ,Rect rect, Boolean isDebug){
+		beforeTouching = original.clone();
+		Mat paper = original.clone();
+
+
+		vision.grayscale(paper);
+		//Imgproc.Canny(paper,paper,100,255);
+		vision.threshold(paper,true);
+		thresholded = paper.clone();
+
+		ArrayList<MatOfPoint> squareConts = vision.getSquareContours(paper, 700);
+		
+		List<Point> points = new ArrayList<>();
+		
+		List<MatOfPoint> cornerBoxes = this.getCornerBoxes(squareConts,rect);
+		
+		points.add(getBL(cornerBoxes.get(0)));
+		points.add(getBR(cornerBoxes.get(1)));
+		points.add(getTR(cornerBoxes.get(2)));
+		points.add(getTL(cornerBoxes.get(3)));
+		
+		Mat normalized = getFourpointTransform(points, original);
+		
+		Imgproc.circle(original, points.get(0) , 10, new Scalar(0,0,0,255), 8);
+		Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255,255), 8);
+		Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0,255), 8);
+		Imgproc.circle(original, points.get(3) , 10, new Scalar(255,0,0,255), 8);
+
+		Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0,255),8);
+		Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255,255),8);
+		Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0,255),8);
+		Imgproc.drawContours(original, cornerBoxes, 3, new Scalar(255,0,0,255),8);
+		marked = original;
+
+		if(isDebug){
+			Imgcodecs.imwrite("scratch/normalized"+".png", normalized);		
+			Imgproc.circle(original, points.get(0) , 10, new Scalar(0,0,0), 8);
+			Imgproc.circle(original, points.get(1) , 10, new Scalar(0,0,255), 8);
+			Imgproc.circle(original, points.get(2) , 10, new Scalar(0,255,0), 8);
+			Imgproc.circle(original, points.get(3) , 50, new Scalar(255,0,0), 50);
+			Imgproc.drawContours(original, cornerBoxes, 0, new Scalar(0,0,0),8);
+			Imgproc.drawContours(original, cornerBoxes, 1, new Scalar(0,0,255),8);
+			Imgproc.drawContours(original, cornerBoxes, 2, new Scalar(0,255,0),8);
+			Imgproc.drawContours(original, cornerBoxes, 3, new Scalar(255,0,0),8);
+			Imgcodecs.imwrite("scratch/TheConts"+".png", original);
+		}
+		
+		
+		return normalized;
+	}
+	
+	
+	
+	
+	public List<MatOfPoint> getCornerBoxes(List<MatOfPoint> squareConts, Rect middleRect){
+		List<MatOfPoint> cornerSquares = new ArrayList<>();
+		
+		int tlIndex, trIndex, blIndex, brIndex; 
+		//double tlDist, trDist, blDist, brDist;
+		int size = squareConts.size();
+		MatOfPoint tempCont;
+		
+		int i = 1;		
+		tlIndex=0; 
+		trIndex=0;
+		blIndex=0;
+		brIndex=0;
+		/*
+		Point tlPoint = new Point(0,0);
+		Point trPoint = new Point (width,0);
+		Point blPoint = new Point(0,height);
+		Point brPoint = new Point(width,height);
+		*/
+		
+		Point tlPoint = middleRect.tl();
+		Point trPoint = new Point (middleRect.x + middleRect.width, middleRect.y);
+		Point blPoint = new Point(middleRect.x, middleRect.y + middleRect.height);
+		Point brPoint = middleRect.br();
+		
+		
+		do{
+			tempCont = squareConts.get(i);
+			if(computeDistance(tlPoint, getMid(tempCont)) < computeDistance(tlPoint, getMid(squareConts.get(tlIndex)))){
+				tlIndex = i;
+			}
+			
+			if(computeDistance(trPoint, getMid(tempCont)) < computeDistance(trPoint, getMid(squareConts.get(trIndex)))){
+				trIndex = i;
+			}
+			
+			if(computeDistance(brPoint, getMid(tempCont)) < computeDistance(brPoint, getMid(squareConts.get(brIndex)))){
+				brIndex = i;
+			}
+			
+			if(computeDistance(blPoint, getMid(tempCont)) < computeDistance(blPoint, getMid(squareConts.get(blIndex)))){
+				blIndex = i;
+			}
+			
+			i++;
+		}while(i <size);
+		 	
+		
+		cornerSquares.add(squareConts.get(tlIndex));
+		cornerSquares.add(squareConts.get(trIndex));
+		cornerSquares.add(squareConts.get(brIndex));
+		cornerSquares.add(squareConts.get(blIndex));
+		
+		return cornerSquares;
+	}
+	
+	
+	
+	
 	public List<MatOfPoint> getCornerBoxes(List<MatOfPoint> squareConts, int height, int width){
 		List<MatOfPoint> cornerSquares = new ArrayList<>();
 		

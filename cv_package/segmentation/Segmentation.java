@@ -33,6 +33,7 @@ import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
 import cv_package.paperextractorv2.FourCornerBoxv2;
 import cv_package.paperextractorv2.FourCornerBoxv3;
+import cv_package.paperextractorv2.FourCornerBoxv4;
 
 
 public class Segmentation {
@@ -69,14 +70,15 @@ public class Segmentation {
 	}
 	
 	public void segment(Form form) {
-
+		
+		System.out.println("hello world");
+		
+		
 		//Extract paper here;
-		FourCornerBoxv2 extract = new FourCornerBoxv2(this.saver,this.printer);
+		FourCornerBoxv4 extract = new FourCornerBoxv4(this.saver,this.printer);
 		form.setImage(extract.extractPaper(form.getImage()));
 		
-		
 		textSeg = new TextSegmentation(saver);
-
 		markSeg = new OpticalMarkSegmentationv2(saver);
 
 		

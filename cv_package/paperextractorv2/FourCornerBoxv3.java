@@ -9,7 +9,7 @@ import cv_package.debug.LocalSaver;
 import cv_package.segmentation.FourSquareCornerv2;
 
 public class FourCornerBoxv3 {
-	
+	//This one assumes the input's center is already cropped.
 	
 	 public static String TAG = "FOURCORNERBOX";
 	    LocalSaver saver;
