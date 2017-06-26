@@ -10,6 +10,8 @@ import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 public class BorderHandler {
@@ -17,10 +19,32 @@ public class BorderHandler {
 	
 	private static Sorting sort = Sorting.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
+    private static BorderHandler bh = new BorderHandler();
+    public static BorderHandler getInstance() { return bh; }
+	
+	
+	public Mat getBorders(Mat paper){
+		
+		
+		Mat filled = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
+		Mat filled2 = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
+		Mat result = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
+		
+		Imgproc.morphologyEx(paper, filled, Imgproc.MORPH_OPEN, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(paper.cols()/30,3)));
+		Imgproc.morphologyEx(paper, filled2, Imgproc.MORPH_OPEN, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(3,paper.rows()/30)));
+		
+		Core.add(filled, filled2, result);
+		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_ERODE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1),new Point(-1,-1)));
+		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_DILATE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1), new Point(-1,-1)));
+		Imgcodecs.imwrite("fire.jpg",paper);
+		return result;
+	}
 	
 	
 	
-public void removeBorder(Mat m, int num){
+	
+	
+	public Mat removeBorder(Mat m){
 		
 		Mat filled = new Mat(m.rows(), m.cols(), CvType.CV_8UC1, new Scalar(255));
 		Mat inv = m.clone();
@@ -43,6 +67,7 @@ public void removeBorder(Mat m, int num){
         //saver.saveImage("scratch", num+"orig",m);
 		Core.add(m, filled,result);
 		cv.invert(result);
+		return result;
 		//saver.saveImage("scratch", num+"result",result);
 				
 	}
@@ -55,6 +80,9 @@ public void removeBorder(Mat m, int num){
 		img.adjustROI(-heightAdjust, -heightAdjust, -widthAdjust, -widthAdjust);
 		return img;
 	}
+	
+	
+	
 	
 	
 	public List<MatOfPoint> getLargestContours(List<MatOfPoint> contours, int elementCount) {
