@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import cv_package.testgen.Segmenter;
+import cv_package.testgen.Segmenter2;
 
 public class TestUI {
 	
@@ -37,7 +38,11 @@ public class TestUI {
 //	String filepath = "C:/Users/Hannah/Desktop/yo2.png";
 //	String filepath = "C:/Users/Hannah/Desktop/test-yo2.jpg";
 //	String filepath = "C:/Users/Hannah/Desktop/yox2.png";
-	String filepath = "Eto na talaga/yox2.png";
+//	String filepath = "Eto na talaga/yox2.png";
+//	String filepath = "C:/Users/Hannah/Desktop/here we go/form-1.png";
+	String filepath = "C:/Users/Hannah/Desktop/ft.jpg";
+
+	private static PanelBuilder pb = PanelBuilder.getInstance();
 	
 	public static void main(String args[]) {
 		TestUI ui = new TestUI();
@@ -112,9 +117,14 @@ public class TestUI {
 	
 	public void startImageProcess() {
 		progressPanel.removeAll();
-		PanelBuilder pb = new PanelBuilder(progressPanel, frame);
-		Segmenter s = new Segmenter(pb);
-		s.segment(filepath);
+		pb.init(progressPanel, frame);
+		Segmenter2 s = new Segmenter2();
+		try {
+			s.segment(filepath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void autoInput() {

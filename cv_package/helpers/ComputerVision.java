@@ -50,6 +50,11 @@ public class ComputerVision {
         threshold(mat, true);
     }
     
+    public void preprocess2(Mat mat) {
+        grayscale(mat);
+        threshold(mat, false);
+    }
+    
     public ArrayList<MatOfPoint> findContours(Mat img, int heirarchy) {
         ArrayList<MatOfPoint> contoursFound = new ArrayList<>();
 //        Imgproc.findContours(img, contoursFound, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);

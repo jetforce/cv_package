@@ -12,8 +12,14 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 
+import cv_package.dumps.Time;
+
 public class HandwrittenDigitClassifier {
-	
+
+	private static HandwrittenDigitClassifier hdc = new HandwrittenDigitClassifier();
+    public static HandwrittenDigitClassifier getInstance() { return hdc; }
+    private HandwrittenDigitClassifier() { }
+
 	private MultiLayerNetwork model;
 	private NativeImageLoader loader;
 //	private String modelLoc = "trained_mnist_model.zip";

@@ -8,13 +8,24 @@ import javax.swing.JPanel;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 
+import cv_package.dumps.Folder;
+
 public class PanelBuilder {
 
 	JPanel panel;
-	
 	JFrame frame;
 	
-	public PanelBuilder(JPanel panel, JFrame frame) {
+	private static PanelBuilder pb = new PanelBuilder();
+    public static PanelBuilder getInstance() { return pb; }
+    private PanelBuilder() { }
+    
+//	public PanelBuilder(JPanel panel, JFrame frame) {
+//		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+//		this.panel = panel;
+//		this.frame = frame;
+//	}
+	
+	public void init(JPanel panel, JFrame frame) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		this.panel = panel;
 		this.frame = frame;
