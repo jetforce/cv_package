@@ -10,6 +10,8 @@ public class Mark extends Type {
 	public ArrayList<Mat> markMats;
 	public ArrayList<Integer> markValues;
 	public ArrayList<Boolean> markDecision;
+	public int choices;
+	
 	
 	public Mark() {
 		typename = "MARK";
@@ -17,5 +19,13 @@ public class Mark extends Type {
 		markMats = new ArrayList<>();
 		markValues = new ArrayList<>();
 	}
+	
+	public void addMark(Mat mark, int shade){
+		markMats.add(mark);
+		markValues.add(shade);
+	}
+	
+	
+	
 	
 }

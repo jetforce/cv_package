@@ -56,8 +56,8 @@ public class Filtering {
 //		System.out.println("contours-"+contours2.size());
 		contours2 = contours.subList(0, elementCount);
 		contours2 = sort.contourPositions(contours2);
-		draw(mainImage, contours2, 321);
 		
+		draw(mainImage, contours2, 321);
 		return getImages(mainImage, contours2);
 	}
     

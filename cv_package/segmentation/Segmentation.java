@@ -110,18 +110,26 @@ public class Segmentation {
 		Mat sampleImage = paperImage.clone();
 		cv.invert(sampleImage);
 
+		
+		
 		List<Mat> groupImages = filter.borderRemoval(groupContours, sampleImage.clone(), true);
-
+		
+		
 		int size = groupImages.size();
+		
+		System.out.println("Size is "+size);
+		
 		int[] temp;
-
+		
+		TableSegmentation ts = new TableSegmentation();
+		
 		for(int i = 0; i < size; i++) {
 			//t.start();
 			switch(groupTypes[i]) {
 				case FIELDTYPE_TEXT:
 					List<List<Mat>> images = textSeg.segment(groupImages.get(i).clone(), form, i);
 					form.setAnswer(i, new TextAnswer(images));
-					System.out.println("     [OK] Group # " + i + " SEGMENTATION: Letters Good");
+					System.out.println(" 	[OK] Group # " + i + " SEGMENTATION: Letters Good");
 					break;
 				case FIELDTYPE_MARK:
 					temp = markSeg.recognize(groupImages.get(i), form.getElementCount()[i], i);
@@ -129,6 +137,10 @@ public class Segmentation {
 					break;
 				case FIELDTYPE_BLOB:
 					form.setAnswer(i, new BlobAnswer(groupImages.get(i)));
+					break;
+				case 4:
+					ts.segment(groupImages.get(i));
+					break;
 			}
 			//t.stop();
 			printer.print("HANNAH > ", "group done "+i);

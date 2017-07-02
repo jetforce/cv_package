@@ -36,7 +36,6 @@ public class BorderHandler {
 		Core.add(filled, filled2, result);
 		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_ERODE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1),new Point(-1,-1)));
 		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_DILATE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1), new Point(-1,-1)));
-		Imgcodecs.imwrite("fire.jpg",paper);
 		return result;
 	}
 	

@@ -9,10 +9,12 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
+import cv_package.basicelem2.Mark;
 import cv_package.debug.LocalSaver;
 import cv_package.helpers.BorderHandler;
 import cv_package.helpers.ComputerVision;
@@ -45,10 +47,8 @@ public class OpticalMarkSegmentationv2 {
 	public int[] recognize(Mat box,int numChoices,int i){
 
 		saver.saveImage("Box" + i, box);
-
 		Mat individual = box.clone();
 
-		
 		int answerValues[] = new int[numChoices];
 
 
@@ -72,6 +72,37 @@ public class OpticalMarkSegmentationv2 {
 	}
 
 
+	public void go(Mark component){
+		
+		Mat image = component.image;
+		int numChoices = component.choices;
+		
+		
+		Mat borderless = bh.removeBorder(image);
+		Rect temp;
+		int numshade;
+		
+		List<MatOfPoint> contours = new ArrayList<>();
+		Mat hierarchy = new Mat();
+		Imgproc.findContours(borderless, contours, hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+		
+		contours = filterGroups(contours,numChoices);
+		
+		
+		Mat filled = new Mat(borderless.rows(), borderless.cols(), CvType.CV_8UC1, new Scalar(0));
+		Imgproc.drawContours(filled, contours, -1, new Scalar(255));
+		
+		Imgcodecs.imwrite("whynotworking.jpg",filled);
+		
+		
+		for(int i=0;i< numChoices;i++){
+			temp = Imgproc.boundingRect(contours.get(i));
+			numshade = this.countWhite(borderless.submat(temp));
+			component.addMark(borderless.submat(temp),numshade);	
+		}
+		
+	}
+	
 	
 	
 	public int[] getAnswers(Mat image, int numChoices){
@@ -98,7 +129,7 @@ public class OpticalMarkSegmentationv2 {
 		
 		
 		
-		Imgproc.drawContours(borderless, contours,-1, new Scalar(255),-1);
+		//Imgproc.drawContours(borderless, contours,-1, new Scalar(255),-1);
 		
 		//Imgcodecs.imwrite("noBorder.jpg", borderless);
 		return answerValues;
@@ -150,7 +181,6 @@ public class OpticalMarkSegmentationv2 {
 				}
 			}
 		}
-		
 		
 		return count;
 		

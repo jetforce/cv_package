@@ -18,7 +18,7 @@ import cv_package.basicelem2.Form;
 
 public class MainTest {
 	
-	/*
+	
 	
 	private static Filtering filter = Filtering.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
@@ -52,7 +52,7 @@ public class MainTest {
 	}
 	
 	public void ocrTest2() {
-		OCR ocr = new OCR();
+		OCR ocr = OCR.getInstance();
 		Mat ocrimage = Imgcodecs.imread("Tests/OCR2/ocr2-test.png");
 		Imgproc.cvtColor(ocrimage, ocrimage, Imgproc.COLOR_BGR2GRAY);
 		Imgproc.threshold(ocrimage, ocrimage, 100, 255, Imgproc.THRESH_BINARY);
@@ -76,7 +76,7 @@ public class MainTest {
 	}
 	
 	public void ocrTest() {
-		OCR ocr = new OCR();
+		OCR ocr = OCR.getInstance();
 		Mat ocrimage = Imgcodecs.imread("Tests/OCR/ocr-test-4.png");
 		Imgproc.cvtColor(ocrimage, ocrimage, Imgproc.COLOR_BGR2GRAY);
 		Imgproc.threshold(ocrimage, ocrimage, 100, 255, Imgproc.THRESH_BINARY);
@@ -139,6 +139,6 @@ public class MainTest {
 //			}
 //		}
 //	}
-	*/
+	
 		
 }
