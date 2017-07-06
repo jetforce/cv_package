@@ -32,11 +32,16 @@ public class HandwrittenDigitClassifier {
 	private String modelLoc = "src/cv_package/_model/trained_mnist_model.zip";
 	private List<Integer> labelList = Arrays.asList(0,1,2,3,4,5,6,7,8,9);
 	
+	
 	public static void main(String args[]) throws Exception {
 		HandwrittenDigitClassifier m = new HandwrittenDigitClassifier();
 		m.init();
 		m.test();
 //		System.out.println("RESULT -> "+m.classify("0.jpg"));
+	}
+
+	public void setModelLocation(String loc) {
+		modelLoc = loc;
 	}
 	
 	public void test() throws IOException {
