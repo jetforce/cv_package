@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import cv_package.debug.LocalPrinter;
+
 public class Time {
 
 	private static Time time = new Time();
@@ -18,9 +20,15 @@ public class Time {
 	private SimpleDateFormat sdf = new SimpleDateFormat("HH.mm.ss.SSS");
 	private Timestamp start, before, mark;
 	private ArrayList<String> times = new ArrayList<>();
+	
+	private LocalPrinter printer;
     
 	public void setPath(String path) {
 		this.path = path;
+	}
+	
+	public void setPrinter(LocalPrinter print) {
+		this.printer = print;
 	}
 	
     public void start() {
@@ -28,7 +36,10 @@ public class Time {
     	mark = before;
     	start = before;
     	String currTimeStr = sdf.format(before);
-    	times.add(currTimeStr + "  Start");
+    	String str = currTimeStr + "  Start";
+    	times.add(str);
+    	
+    	printer.print("time", str);
 //     	saveTime(str);
     }
     
@@ -46,7 +57,8 @@ public class Time {
      	String diff = getDiffMilli(before, now)+"";
      	String str = currTimeStr + "  " + label + " (" + diff + "mil)";
      	times.add(str);
-     	System.out.println(str);
+     	printer.print("time", str);
+//     	System.out.println(str);
 //     	saveTime(str);
      	before = now;
      	return diff;
@@ -57,13 +69,15 @@ public class Time {
      	String currTimeStr = sdf.format(now);
      	String str = currTimeStr + "  " + label + " (" + getDiffMilli(before, now) + "mil)";
      	times.add(str);
-     	System.out.println(str);
+//     	System.out.println(str);
+     	printer.print("time", str);
 //     	saveTime(str);
      	before = now;
      	
  		String milestone = "********* " + label + " (" + getDiffMilli(mark, now) + "mil) " + "(" + getDiffSec(mark, now) + "sec) ";
  		times.add(milestone);
-     	System.out.println(milestone);
+//     	System.out.println(milestone);
+     	printer.print("time", str);
 // 		saveTime(milestone);
  		mark = now;
     }
@@ -94,15 +108,17 @@ public class Time {
     }
     
     public void saveTime() {
-    	try{
-    	    PrintWriter writer = new PrintWriter(path+File.separator+filename, "UTF-8");
-    	    for(String t:times) {
-        	    writer.println(t);
-    	    }
-    	    writer.close();
-    	} catch (IOException e) {
-    	   // do something
-    		e.printStackTrace();
+    	if(Folder.getInstance().isSaving()) {
+	    	try{
+	    	    PrintWriter writer = new PrintWriter(path+File.separator+filename, "UTF-8");
+	    	    for(String t:times) {
+	        	    writer.println(t);
+	    	    }
+	    	    writer.close();
+	    	} catch (IOException e) {
+	    	   // do something
+	    		e.printStackTrace();
+	    	}
     	}
     }
     

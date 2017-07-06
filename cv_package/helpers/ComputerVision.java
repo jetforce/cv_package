@@ -4,6 +4,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
@@ -58,12 +59,17 @@ public class ComputerVision {
     public ArrayList<MatOfPoint> findContours(Mat img, int heirarchy) {
         ArrayList<MatOfPoint> contoursFound = new ArrayList<>();
 //        Imgproc.findContours(img, contoursFound, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.findContours(img, contoursFound, new Mat(), heirarchy, Imgproc.CHAIN_APPROX_NONE);
+        Imgproc.findContours(img.clone(), contoursFound, new Mat(), heirarchy, Imgproc.CHAIN_APPROX_NONE);
         Collections.reverse(contoursFound);
         return contoursFound;
     }
     
-    
+    public ArrayList<MatOfPoint> findContoursExt(Mat img) {
+        ArrayList<MatOfPoint> contoursFound = new ArrayList<>();
+        Imgproc.findContours(img.clone(), contoursFound, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
+        Collections.reverse(contoursFound);
+        return contoursFound;
+    }
     
     public void gaussianBlur(Mat image){
     	 Imgproc.GaussianBlur(image, image,new Size(45,45), 0);

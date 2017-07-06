@@ -26,6 +26,53 @@ public class Filtering {
     private static Filtering filter = new Filtering();
     public static Filtering getInstance() { return filter; }
     private Filtering() { }
+      
+//    public ArrayList<Mat> adjustROIs(ArrayList<MatOfPoint> contours, int x) {
+//    	int size = contours.size();
+//    	ArrayList<Mat> mats = new ArrayList<>();
+//    	int i = 0;
+//    	for(MatOfPoint c:contours) {
+//    		Mat temp = c.adjustROI(x, x, x, x);
+//    		temp.convertTo(temp, CvType.CV_8UC3);
+//    		mats.add(temp);
+//    		Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/roi"+i+".png", temp); i++;
+//    	}
+//    	return mats;
+//    }
+    
+    public Mat cleanBackground(Mat image, ArrayList<MatOfPoint> contours) {
+    	Scalar white = new Scalar(255);
+    	Scalar black = new Scalar(0);
+    	Mat image2 = drawAndFillContour(image, contours, white, black);
+    	Mat image3 = new Mat();
+    	Core.multiply(image, image2, image3);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image1.png", image);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image2.png", image2);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image3.png", image3);
+    	return image3;
+    }
+    
+    public Mat drawAndFillContour(Mat image, ArrayList<MatOfPoint> contours, Scalar colorContour, Scalar colorBackground) {
+    	Mat image2 = new Mat(image.size(), image.type(), colorBackground);
+    	int fill = -1;
+    	int size = contours.size();
+    	
+    	for(int i = 0; i < size; i++) {
+    		Imgproc.drawContours(image2, contours, i, colorContour, fill);
+    	}	
+    	
+    	return image2;
+    }
+    
+    public Mat drawAndFillContour(Mat image, ArrayList<MatOfPoint> contours, int index, Scalar colorContour, Scalar colorBackground) {
+    	Mat image2 = new Mat(image.size(), image.type(), colorBackground);
+    	int fill = -1;
+    	Imgproc.drawContours(image2, contours, index, colorContour, fill);
+    	return image2;
+    }
+        
+    
+    
     
     public Mat removeSmallContours(Mat image, List<MatOfPoint> smallContours) {
     	Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
@@ -82,10 +129,10 @@ public class Filtering {
 			Imgproc.drawContours(image2, contours, i, new Scalar(0));
 			
 			Rect r = Imgproc.boundingRect(contours.get(i));
-			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
+//			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
 		}
 		
-		folder.save(image2);
+//		folder.save(image2);
 		
 		return image2;
     }
@@ -108,6 +155,18 @@ public class Filtering {
 //		folder.save(draw(mainImage, contours2));
 		
 		return getImages(mainImage, contours2);
+	}
+    
+    public List<MatOfPoint> largeAreaContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours = sort.contourAreas(contours, sort.ORDER_DESC);
+//		System.out.println("contours-"+contours2.size());
+		contours2 = contours.subList(0, elementCount);
+		contours2 = sort.contourPositions(contours2);
+//		draw(mainImage, contours2, 321);
+//		folder.save(draw(mainImage, contours2));
+		
+		return contours2;
 	}
     
     public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
@@ -144,6 +203,30 @@ public class Filtering {
 		
 		return image3;
 	}
+	
+	// for char outlines
+		public Mat removeOutlineChar(Mat image) {
+			Scalar black = new Scalar(0);
+			Scalar white = new Scalar(255);
+			
+			List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_LIST);
+			contours = sort.contourAreas(contours, sort.ORDER_DESC);
+			contours = contours.subList(0, 2);
+
+			Mat image1 = image.clone();
+			cv.invert(image1);
+//			folder.save(image1, "image1 - inverted");
+		
+			// black bg, white loob
+			Mat image2 = new Mat(image.size(), image.type(), black);
+			Imgproc.drawContours(image2, contours, 0, white, -1);
+//			folder.save(image2, "image2 - filled");
+			
+			Mat image3 = new Mat(image.size(), image.type());
+			Core.multiply(image1, image2, image3);
+			
+			return image3;
+		}
 	
 	// for blob outlines
 	public Mat removeOutline2(Mat image) {

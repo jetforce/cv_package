@@ -19,6 +19,7 @@ import cv_package.basicelem2.Mark;
 import cv_package.basicelem2.Set;
 import cv_package.basicelem2.Text;
 import cv_package.basicelem2.Type;
+import cv_package.debug.LocalPrinter;
 import cv_package.dumps.Error;
 import cv_package.dumps.Folder;
 import cv_package.dumps.Images;
@@ -52,6 +53,8 @@ public class Segmenter2 {
 	
 	private String filepath, structpath;
 	
+	private Mat img;
+	
 	public Segmenter2() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 //		createFolder();
@@ -66,22 +69,49 @@ public class Segmenter2 {
 //		time.stamp("digit classifier init done");
 	}
 	
-	public void init(String filepath, String structpath) throws IOException {
+//	public void init(String filepath, String structpath) throws IOException {
+//		this.filepath = filepath.replace("\\", "/");
+//		this.structpath = structpath.replace("\\", "/");
+//		
+//		folder.init();
+//		time.start();
+//		hdc.init();
+//		time.stamp("digit model done loading");
+//	}
+	
+	public void init(String filepath, boolean isSaving, LocalPrinter printer) throws IOException {
 		this.filepath = filepath.replace("\\", "/");
-		this.structpath = structpath.replace("\\", "/");
 		
 		folder.init();
-		time.start();
+		folder.setSaving(isSaving);
 		hdc.init();
+		time.setPrinter(printer);
+		time.start();
 		time.stamp("digit model done loading");
 		
+		img = Imgcodecs.imread(filepath);
+	}
+	
+	public void init(Mat image, boolean isSaving, LocalPrinter printer) throws IOException {
+//		this.filepath = filepath.replace("\\", "/");
+		
+		folder.init();
+		folder.setSaving(isSaving);
+		hdc.init();
+		time.setPrinter(printer);
+		time.start();
+		time.stamp("digit model done loading");
+		
+		img = image;
+	}
+	
+	public void initForm() {		
 		FormFileReader2 reader = new FormFileReader2();
 		form = new Form();
 		reader.readToForm(structpath, form);
 	}
 	
 	public void segment() throws IOException {
-		Mat img = Imgcodecs.imread(filepath);
 		folder.save(img, "ORIG");
 
     	cv.preprocess2(img);
@@ -94,6 +124,13 @@ public class Segmenter2 {
 		folder.save(getbetter);
 		folder.save(main);
 		
+		time.stamp("form number extracting..");
+		int formNumber = getFormNumber(getbetter);
+		structpath = folder.getStructPath(formNumber);
+		initForm();
+		form.formNumber = formNumber;
+		time.stamp("form init done..");
+		
 		main = filter.removeOutlineFinal(main);
 		form.image = main;
 
@@ -104,28 +141,44 @@ public class Segmenter2 {
 		time.end();
 	}
 	
-	private void getPrimaryInfo(Mat image) throws IOException {
-
+	private int getFormNumber(Mat image) throws IOException {
 		ArrayList<Mat> infoMat = (ArrayList<Mat>) 
-				filter.largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), 2);
+				filter.largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), 1);
 
-		Mat patientNumMat = infoMat.get(0);
-		Mat formNumMat = infoMat.get(1);
-
-		folder.save(patientNumMat, "patient");
+		Mat formNumMat = infoMat.get(0);
+		
+		cv.invert(formNumMat);
+		
 		folder.save(formNumMat, "form");
 
-		hdc.init();
-//		hdc.test();
-		
-		int patientNumber = ocr.go(patientNumMat, PATIENT_NUM_COUNT);
-		time.stamp("Patient Number: " + patientNumber);
-		
-		int formNumber = ocr.go(formNumMat, FORM_NUM_COUNT);
+		int formNumber = ocr.go(formNumMat, 1);
 		time.stamp("Form Number: " + formNumber);
 		
+		return formNumber;
 	}
-	
+//	
+//	private void getPrimaryInfo(Mat image) throws IOException {
+//
+//		ArrayList<Mat> infoMat = (ArrayList<Mat>) 
+//				filter.largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), 2);
+//
+//		Mat patientNumMat = infoMat.get(0);
+//		Mat formNumMat = infoMat.get(1);
+//
+//		folder.save(patientNumMat, "patient");
+//		folder.save(formNumMat, "form");
+//
+//		hdc.init();
+////		hdc.test();
+//		
+//		int patientNumber = ocr.go(patientNumMat, PATIENT_NUM_COUNT);
+//		time.stamp("Patient Number: " + patientNumber);
+//		
+//		int formNumber = ocr.go(formNumMat, FORM_NUM_COUNT);
+//		time.stamp("Form Number: " + formNumber);
+//		
+//	}
+//	
 	private void go(Mat image, ArrayList<Type> components) throws IOException {
 		
 		List<Mat> mats = filter.largeAreaElements
@@ -142,11 +195,12 @@ public class Segmenter2 {
 			
 			switch(c.typename) {
 			case "TEXT": 
-				long num = ocr.goo((Text)c); 
+//				long num = ocr.goo((Text)c); 
+				String num = ocr.gooString((Text)c);
 				time.stamp("num: "+num);
 				break;
-//			case "MARK": omr.go((Mark)c); break;
-//			case "BLOB": goBlob((Blob)c, mats.get(index)); break;
+			case "MARK": omr.go((Mark)c); break;
+			case "BLOB": goBlob((Blob)c, mats.get(index)); break;
 			default: System.out.println("Error typename invalid");
 			}
 			

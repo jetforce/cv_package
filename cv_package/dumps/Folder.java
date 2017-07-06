@@ -18,22 +18,31 @@ public class Folder {
 	private static Folder folder = new Folder();
     public static Folder getInstance() { return folder; }
     private Folder() { }
-    
+
+    public static String structpath = "C:/Users/Hannah/Desktop/Form Txt Files";
     public static String mainpath = "C:/Users/Hannah/Desktop/TEST";
     public static String folderpath;
+
+    private boolean isSaving = false;
     
     public String save(Mat img, String label) {
-		String imagepath = images.save(img);
-		String timediff = time.stamp((images.getCount()-1) + " - " + label);
-//		pb.addImage(label + " - " + timediff, imagepath);
-		return imagepath;
+    	if(isSaving) {
+			String imagepath = images.save(img);
+			String timediff = time.stamp((images.getCount()-1) + " - " + label);
+	//		pb.addImage(label + " - " + timediff, imagepath);
+			return imagepath;
+    	}
+    	return "";
 	}
     
     public String save(Mat img) {
-		String imagepath = images.save(img);
-		String timediff = time.stamp((images.getCount()-1) + "");
-//		pb.addImage(timediff, imagepath);
-		return imagepath;
+    	if(isSaving) {
+			String imagepath = images.save(img);
+			String timediff = time.stamp((images.getCount()-1) + "");
+	//		pb.addImage(timediff, imagepath);
+			return imagepath;
+		}
+		return "";
 	}
     
 //    public String getPath() {
@@ -41,16 +50,36 @@ public class Folder {
 //    }
     
     public void createFolder() {
-		SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.HH.mm.ss");
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		folderpath = mainpath + File.separator + sdf.format(timestamp);
-		new File(folderpath).mkdir();
+    	if(isSaving) {
+			SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.HH.mm.ss");
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			folderpath = mainpath + File.separator + sdf.format(timestamp);
+			new File(folderpath).mkdir();
+    	}
 	}
     
     public void init() {
-    	createFolder();
-		images.setPath(folderpath);
-		time.setPath(folderpath);
+    	if(isSaving) {
+        	createFolder();
+    		images.setPath(folderpath);
+    		time.setPath(folderpath);
+    	}
+    }
+    
+    public void setStructPath(String structpath) {
+    	this.structpath = structpath;
+    }
+    
+    public String getStructPath(int formnumber) {
+    	return structpath + File.separator + formnumber + ".txt";
+    }
+    
+    public void setSaving(boolean isSaving) {
+    	this.isSaving = isSaving;
+    }
+    
+    public boolean isSaving() {
+    	return isSaving;
     }
     
 }
