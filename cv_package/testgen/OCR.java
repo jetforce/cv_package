@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -129,6 +131,7 @@ public class OCR{
 	}
     
 	public void go(Text comp) {
+	
 		comp.characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
 		// recognize
 	}
@@ -160,6 +163,23 @@ public class OCR{
 		return hasChar;
 	}
 	
+	
+	
+	
+
+	// MAT (output) contains a char - biggest contour in its box - A
+	/*
+	public Mat getMatChar(Mat image) {
+		image = filter.removeBackground(image);
+		List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL);	
+		contours = sort.contourAreas(contours, sort.ORDER_DESC);
+		Rect charRect = Imgproc.boundingRect(contours.get(0));
+		return image.submat(charRect);
+	}
+
+	*/
+
+
 	public boolean isCharacter(MatOfPoint largestContour) {
 		boolean isChar = true;
 		double thresh = 10.0;
@@ -319,6 +339,7 @@ public class OCR{
 	
 	// MAT (output) contains a char - A
 	public List<Mat> getMatListCharsClean(Mat image, int charBoxCnt) {
+
 		Mat x = image.clone();
 //		cv.invert(x);
 //		folder.save(x, "invert");
@@ -334,16 +355,17 @@ public class OCR{
 		
 		List<Mat> matChars = null;
 		matChars = filter.largeAreaElements(x, cv.findContours(x.clone(), Imgproc.RETR_LIST), charBoxCnt);
-		
 		List<Mat> matCharsClean = new ArrayList<>();
+
 		int i = 0;
 		for(Mat m:matChars) {
 //			folder.save(m, "before");
 			Mat matC = getMatChar(m);
 			matCharsClean.add(matC);
 //			folder.save(matC, "after");
+
 		}
-		
+				
 		return matCharsClean;
 	}
 	

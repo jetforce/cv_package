@@ -13,8 +13,8 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-
 import cv_package.basicelem2.Blob;
+import cv_package.segmentation.SmartSegment;
 import cv_package.dumps.Folder;
 
 public class Filtering {
@@ -121,53 +121,64 @@ public class Filtering {
 //		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
 //		comp.image = img;
 //    }
-    
     public Mat draw(Mat image, List<MatOfPoint> contours) {
 		Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
 		
 		for(int i = 0; i < contours.size(); i++) {
 			Imgproc.drawContours(image2, contours, i, new Scalar(0));
-			
 			Rect r = Imgproc.boundingRect(contours.get(i));
-//			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
+			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
 		}
-		
+
+//		Imgcodecs.imwrite("Tests/OCR/3 LETTER BORDERES.jpg", image2);
+		Imgcodecs.imwrite("Imdrawingthis.jpg", image2);
+//		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);		
 //		folder.save(image2);
-		
 		return image2;
     }
     
-    public Mat draw(Mat image, List<MatOfPoint> contours, int i) {
+    public Mat draw(Mat image, List<MatOfPoint> contours, int num) {
 		Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
 		
-		Imgproc.drawContours(image2, contours, i, new Scalar(0));
-		
+		for(int i = 0; i < contours.size(); i++) {
+			Imgproc.drawContours(image2, contours, i, new Scalar(0));
+			Rect r = Imgproc.boundingRect(contours.get(i));
+			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
+		}
+
+//		Imgcodecs.imwrite("Tests/OCR/3 LETTER BORDERES.jpg", image2);
+		Imgcodecs.imwrite("Imdrawingthis.jpg", image2);
+//		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);		
+//		folder.save(image2);
 		return image2;
     }
     
+
     public List<Mat> largeAreaElements(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
 //		System.out.println("contours-"+contours2.size());
 		contours2 = contours.subList(0, elementCount);
 		contours2 = sort.contourPositions(contours2);
-//		draw(mainImage, contours2, 321);
-//		folder.save(draw(mainImage, contours2));
-		
+		//new SmartSegment().printFormFeatures(contours2);
+		draw(mainImage, contours2, 321);
 		return getImages(mainImage, contours2);
 	}
+
     
-    public List<MatOfPoint> largeAreaContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+    public List<MatOfPoint> largestAreaContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
 //		System.out.println("contours-"+contours2.size());
 		contours2 = contours.subList(0, elementCount);
 		contours2 = sort.contourPositions(contours2);
-//		draw(mainImage, contours2, 321);
-//		folder.save(draw(mainImage, contours2));
-		
+
+		//new SmartSegment().printFormFeatures(contours2);
+		draw(mainImage, contours2, 321);
 		return contours2;
 	}
+
     
     public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
 		List<Mat> elements = new ArrayList<>();

@@ -1,30 +1,30 @@
 package cv_package.paperextractorv2;
 
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Rect;
+
 import cv_package.debug.LocalPrinter;
 import cv_package.debug.LocalSaver;
-import cv_package.segmentation.FourSquareCorner;
 import cv_package.segmentation.FourSquareCornerv2;
 
-/**
- * Created by jet on 3/22/2017.
- */
-
-public class FourCornerBoxv2 {
-
+public class FourCornerBoxv4 {
+	//Does not crop the image...
+	//Uses the centrer as the basis of the cloest rectangles
+	//Best version so far.
+	
+	
+	
     public static String TAG = "FOURCORNERBOX";
     LocalSaver saver;
     LocalPrinter printer;
 
-    public FourCornerBoxv2(LocalSaver saver, LocalPrinter printer){
+    public FourCornerBoxv4(LocalSaver saver, LocalPrinter printer){
         this.saver = saver;
         this.printer = printer;
     }
 
-
+    
 
     public Mat extractPaper(Mat originalBitmap) {
 
@@ -46,13 +46,11 @@ public class FourCornerBoxv2 {
         Point vertex2 =  new Point(midWidth + (nWidth/2) , midHeight + (nHeight/2) );
         Rect rect = new Rect(vertex1,vertex2);
 
-        Mat crop = new Mat(rgba, rect);
+        
    
         
-        
-        //t.start();
         FourSquareCornerv2 normalizer = new FourSquareCornerv2();
-        Mat paper = normalizer.Normalize(crop,false);
+        Mat paper = normalizer.Normalize(rgba,rect,false);
         //t.stop();
         
         //t.start();
@@ -69,3 +67,9 @@ public class FourCornerBoxv2 {
 
 
 }
+
+	
+	
+	
+	
+

@@ -113,7 +113,7 @@ public class Segmenter2 {
 	
 	public void segment() throws IOException {
 		folder.save(img, "ORIG");
-
+		
     	cv.preprocess2(img);
     	folder.save(img, "PREPROC");
 		

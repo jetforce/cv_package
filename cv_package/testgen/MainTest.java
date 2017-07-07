@@ -1,3 +1,4 @@
+
 //package cv_package.testgen;
 //
 //import java.io.File;
@@ -15,6 +16,7 @@
 //import cv_package.helpers.Filtering;
 //
 //import cv_package.basicelem2.Form;
+
 //
 //public class MainTest {
 //
@@ -72,6 +74,7 @@
 //		}
 //		
 //	}
+
 //	
 //	public void ocrTest() {
 //		OCR ocr = new OCR();
@@ -139,3 +142,4 @@
 ////	}
 //		
 //}
+
