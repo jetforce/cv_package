@@ -30,6 +30,8 @@ public class Form {
 	//This image contains just the straight lines;
 	public Mat LocationImage;
 	public ArrayList<Mat> processedImages = new ArrayList<>();
+	public int formNumber;
+	
 	
 	public void process() {
 		if(components.size() == 0)
@@ -58,7 +60,7 @@ public class Form {
 		Imgcodecs.imwrite("Helllllo.jpg",justLines);
 		
 		contours = cv.findContours(justLines, Imgproc.RETR_EXTERNAL);
-		List<MatOfPoint> matsContour = filter.largeAreaElementsContours(image.clone(),contours , components.size());
+		List<MatOfPoint> matsContour = filter.largestAreaContours(image.clone(),contours , components.size());
 		List<Mat> mats = filter.getImages(image, matsContour);
 		
 		System.out.println("Components"+ components.size());
@@ -105,5 +107,6 @@ public class Form {
 		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
 		comp.image = img;
     }
+
 	
 }

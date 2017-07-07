@@ -13,44 +13,147 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
-
 import cv_package.basicelem2.Blob;
 import cv_package.segmentation.SmartSegment;
+import cv_package.dumps.Folder;
 
 public class Filtering {
 
 	private static ComputerVision cv = ComputerVision.getInstance();
 	private static Sorting sort = Sorting.getInstance();
-	
+	private static Folder folder = Folder.getInstance();
+
     private static Filtering filter = new Filtering();
     public static Filtering getInstance() { return filter; }
     private Filtering() { }
+      
+//    public ArrayList<Mat> adjustROIs(ArrayList<MatOfPoint> contours, int x) {
+//    	int size = contours.size();
+//    	ArrayList<Mat> mats = new ArrayList<>();
+//    	int i = 0;
+//    	for(MatOfPoint c:contours) {
+//    		Mat temp = c.adjustROI(x, x, x, x);
+//    		temp.convertTo(temp, CvType.CV_8UC3);
+//    		mats.add(temp);
+//    		Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/roi"+i+".png", temp); i++;
+//    	}
+//    	return mats;
+//    }
     
-    public void blob(Blob comp) {
-//    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/ex/____her!!.png", comp.image);
-    	Mat img = comp.image;
-    	img = removeOutline2(comp.image); 
-		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
-		comp.image = img;
+    public Mat cleanBackground(Mat image, ArrayList<MatOfPoint> contours) {
+    	Scalar white = new Scalar(255);
+    	Scalar black = new Scalar(0);
+    	Mat image2 = drawAndFillContour(image, contours, white, black);
+    	Mat image3 = new Mat();
+    	Core.multiply(image, image2, image3);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image1.png", image);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image2.png", image2);
+    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/temp/image3.png", image3);
+    	return image3;
     }
     
-    public Mat draw(Mat image, List<MatOfPoint> contours, int number) {
+    public Mat drawAndFillContour(Mat image, ArrayList<MatOfPoint> contours, Scalar colorContour, Scalar colorBackground) {
+    	Mat image2 = new Mat(image.size(), image.type(), colorBackground);
+    	int fill = -1;
+    	int size = contours.size();
+    	
+    	for(int i = 0; i < size; i++) {
+    		Imgproc.drawContours(image2, contours, i, colorContour, fill);
+    	}	
+    	
+    	return image2;
+    }
+    
+    public Mat drawAndFillContour(Mat image, ArrayList<MatOfPoint> contours, int index, Scalar colorContour, Scalar colorBackground) {
+    	Mat image2 = new Mat(image.size(), image.type(), colorBackground);
+    	int fill = -1;
+    	Imgproc.drawContours(image2, contours, index, colorContour, fill);
+    	return image2;
+    }
+        
+    
+    
+    
+    public Mat removeSmallContours(Mat image, List<MatOfPoint> smallContours) {
+    	Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
+    	Mat image3 = new Mat();
+    	Scalar black = new Scalar(0);
+    	
+    	int i = 0;
+    	for(MatOfPoint c:smallContours) {
+    		Imgproc.drawContours(image2, smallContours, i, black, -1);
+    		i++;
+    	}
+    	
+    	Core.multiply(image, image2, image3);
+    	
+    	return image3;
+    }
+    
+    public Mat removeOutlineFinal(Mat image) {
+		cv.invert(image);
+		folder.save(image);
+		drawBorder(image, new Scalar(255), 5);
+		folder.save(image);
+		return removeOutline2(image);
+    }
+    
+    public void drawBorder(Mat image, Scalar color, int thickness) {
+    	Imgproc.rectangle(image, new Point(0,0), new Point(image.cols()-1, image.rows()-1), color, thickness);
+    }
+    
+    public ArrayList<Mat> divideImage(Mat image, int count) {
+    	ArrayList<Mat> images = new ArrayList<>();
+    	
+		images = (ArrayList<Mat>) largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), count);
+		
+//		for(Mat m:images) {
+//			invert(m);
+//		}
+		
+    	return images;
+    }
+    
+//    public void blob(Blob comp) {
+////    	Imgcodecs.imwrite("C:/Users/Hannah/Desktop/ex/____her!!.png", comp.image);
+//    	Mat img = comp.image;
+//    	img = removeOutline2(comp.image); 
+//		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
+//		comp.image = img;
+//    }
+    public Mat draw(Mat image, List<MatOfPoint> contours) {
 		Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
 		
 		for(int i = 0; i < contours.size(); i++) {
 			Imgproc.drawContours(image2, contours, i, new Scalar(0));
-			
 			Rect r = Imgproc.boundingRect(contours.get(i));
 			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
 		}
 
 //		Imgcodecs.imwrite("Tests/OCR/3 LETTER BORDERES.jpg", image2);
 		Imgcodecs.imwrite("Imdrawingthis.jpg", image2);
-//		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);
-		
+//		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);		
+//		folder.save(image2);
 		return image2;
     }
     
+    public Mat draw(Mat image, List<MatOfPoint> contours, int num) {
+		Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
+		
+		for(int i = 0; i < contours.size(); i++) {
+			Imgproc.drawContours(image2, contours, i, new Scalar(0));
+			Rect r = Imgproc.boundingRect(contours.get(i));
+			Imgproc.putText(image2, ""+i, new Point(r.x,r.y), Core.FONT_HERSHEY_PLAIN, 1, new Scalar(0));
+		}
+
+//		Imgcodecs.imwrite("Tests/OCR/3 LETTER BORDERES.jpg", image2);
+		Imgcodecs.imwrite("Imdrawingthis.jpg", image2);
+//		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);		
+//		folder.save(image2);
+		return image2;
+    }
+    
+
     public List<Mat> largeAreaElements(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
@@ -61,21 +164,21 @@ public class Filtering {
 		draw(mainImage, contours2, 321);
 		return getImages(mainImage, contours2);
 	}
+
     
-    public List<MatOfPoint> largeAreaElementsContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+    public List<MatOfPoint> largestAreaContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
 //		System.out.println("contours-"+contours2.size());
 		contours2 = contours.subList(0, elementCount);
 		contours2 = sort.contourPositions(contours2);
+
 		//new SmartSegment().printFormFeatures(contours2);
 		draw(mainImage, contours2, 321);
 		return contours2;
 	}
-    
-    
-    
-    
+
     
     public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
 		List<Mat> elements = new ArrayList<>();
@@ -112,24 +215,52 @@ public class Filtering {
 		return image3;
 	}
 	
-	// for normal outlines
+	// for char outlines
+		public Mat removeOutlineChar(Mat image) {
+			Scalar black = new Scalar(0);
+			Scalar white = new Scalar(255);
+			
+			List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_LIST);
+			contours = sort.contourAreas(contours, sort.ORDER_DESC);
+			contours = contours.subList(0, 2);
+
+			Mat image1 = image.clone();
+			cv.invert(image1);
+//			folder.save(image1, "image1 - inverted");
+		
+			// black bg, white loob
+			Mat image2 = new Mat(image.size(), image.type(), black);
+			Imgproc.drawContours(image2, contours, 0, white, -1);
+//			folder.save(image2, "image2 - filled");
+			
+			Mat image3 = new Mat(image.size(), image.type());
+			Core.multiply(image1, image2, image3);
+			
+			return image3;
+		}
+	
+	// for blob outlines
 	public Mat removeOutline2(Mat image) {
 		List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_LIST);
 		contours = sort.contourAreas(contours, sort.ORDER_DESC);
 		contours = contours.subList(0, 2);
 		Mat image2 = new Mat(image.size(), image.type(), new Scalar(0));
 		Mat image3 = new Mat(image.size(), image.type());
-		Mat ones = new Mat(image.size(), image.type(), new Scalar(1));
-		
-		// Draw black colored contour on white image
-		Imgproc.drawContours(image2, contours, 1, new Scalar(1));
-		// Fill contour with black color
-		Imgproc.floodFill(image2, new Mat(), new Point(image2.cols()/2, image2.rows()/2), new Scalar(1));
-		// original + new image = main object with white background
+		Mat ones = new Mat(image.size(), image.type(), new Scalar(255));
+
+		Imgproc.drawContours(image2, contours, 1, new Scalar(255));
+		folder.save(image2, "contours");
+
+		Imgproc.floodFill(image2, new Mat(), new Point(image2.cols()/2, image2.rows()/2), new Scalar(255));
+		folder.save(image2, "flood");
+
 		Core.multiply(image, image2, image3);
 		Imgproc.drawContours(image3, contours, 1, new Scalar(0), 5);
+		folder.save(image3, "mul + draw");
 		
-		image3 = getSubImage(image3, contours.get(1));
+//		image3 = getSubImage(image3, contours.get(1));
+
+//		folder.save(image3, "result");
 		
 //			Imgcodecs.imwrite("Tests/_border-1.jpg", image);
 //			Imgcodecs.imwrite("Tests/_border-2conts.jpg", image2);
@@ -148,12 +279,16 @@ public class Filtering {
 		
 		// Draw black colored contour on white image
 		Imgproc.drawContours(image2, contours, 1, new Scalar(0));
+		folder.save(image2,"contour");
 		// Fill contour with black color
 		Imgproc.floodFill(image2, new Mat(), new Point(image2.cols()/2, image2.rows()/2), new Scalar(0));
+		folder.save(image2,"filled");
 		// original + new image = main object with white background
 		Core.add(image, image2, image3);
+		folder.save(image3,"add");
 		
 		image3 = getSubImage(image3, contours.get(1));
+		folder.save(image3);
 		
 //		Imgcodecs.imwrite("Tests/_border-1.jpg", image);
 //		Imgcodecs.imwrite("Tests/_border-2conts.jpg", image2);
@@ -170,7 +305,6 @@ public class Filtering {
 		Mat image2 = new Mat(image.size(), image.type(), new Scalar(255));
 		Mat image3 = new Mat(image.size(), image.type());
 
-		draw(image, contours, 123);
 		// Draw black colored contour on white image
 		// Fill contour with black color
 		
@@ -197,9 +331,9 @@ public class Filtering {
 		image3 = image3.submat(rowS, rowE, colS, colE);
 //		image3 = getSubImage(image3, contours.get(1));
 		
-		Imgcodecs.imwrite("Tests/_ocr-1.jpg", image);
-		Imgcodecs.imwrite("Tests/_ocr-2conts.jpg", image2);
-		Imgcodecs.imwrite("Tests/_ocr-3nomore.jpg", image3);
+//		Imgcodecs.imwrite("Tests/_ocr-1.jpg", image);
+//		Imgcodecs.imwrite("Tests/_ocr-2conts.jpg", image2);
+//		Imgcodecs.imwrite("Tests/_ocr-3nomore.jpg", image3);
 		
 		return image3;
 	}
@@ -277,6 +411,10 @@ public class Filtering {
     public List<MatOfPoint> getLargestN(List<MatOfPoint> contours, int elementCount) {
     	contours = sort.contourAreas(contours, sort.ORDER_DESC);
     	return contours.subList(0, elementCount);
+    }
+
+    public void invert(Mat image) {
+    	Imgproc.threshold(image, image, 100, 255, Imgproc.THRESH_BINARY_INV);
     }
     
 }
