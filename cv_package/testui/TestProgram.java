@@ -52,11 +52,11 @@ public class TestProgram {
 	
 	public void test() throws IOException {
 		Segmenter2 s = new Segmenter2();
-		String filepath = "C:/Users/Hannah/Desktop/formtest5.png";
-		String structpath = "C:/Users/Hannah/Desktop/form-B.txt";
-//				String filepath = "C:/Users/Hannah/Desktop/ft6.jpg";
-//				String structpath = "C:/Users/Hannah/Desktop/form.txt";
-		boolean isSaving = false;
+//		String filepath = "C:/Users/Hannah/Desktop/formtest5.png";
+//		String structpath = "C:/Users/Hannah/Desktop/form-B.txt";
+				String filepath = "C:/Users/Hannah/Desktop/ft6.jpg";
+				String structpath = "C:/Users/Hannah/Desktop/form.txt";
+		boolean isSaving = true;
 		LocalPrinter printer = new Printer();
 		s.init(filepath, isSaving, printer);
 		s.segment();

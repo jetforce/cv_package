@@ -81,9 +81,9 @@ public class Segmenter2 {
 	
 	public void init(String filepath, boolean isSaving, LocalPrinter printer) throws IOException {
 		this.filepath = filepath.replace("\\", "/");
-		
-		folder.init();
+
 		folder.setSaving(isSaving);
+		folder.init();
 		hdc.init();
 		time.setPrinter(printer);
 		time.start();
@@ -94,9 +94,9 @@ public class Segmenter2 {
 	
 	public void init(Mat image, boolean isSaving, LocalPrinter printer) throws IOException {
 //		this.filepath = filepath.replace("\\", "/");
-		
-		folder.init();
+
 		folder.setSaving(isSaving);
+		folder.init();
 		hdc.init();
 		time.setPrinter(printer);
 		time.start();
@@ -124,12 +124,13 @@ public class Segmenter2 {
 		folder.save(getbetter);
 		folder.save(main);
 		
-		time.stamp("form number extracting..");
-		int formNumber = getFormNumber(getbetter);
-		structpath = folder.getStructPath(formNumber);
+//		time.stamp("form number extracting..");
+//		int formNumber = getFormNumber(getbetter);
+//		structpath = folder.getStructPath(formNumber);
+		structpath = "C:/Users/Hannah/Desktop/form.txt";
 		initForm();
-		form.formNumber = formNumber;
-		time.stamp("form init done..");
+//		form.formNumber = formNumber;
+//		time.stamp("form init done..");
 		
 		main = filter.removeOutlineFinal(main);
 		form.image = main;

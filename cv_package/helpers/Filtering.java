@@ -215,12 +215,12 @@ public class Filtering {
 
 			Mat image1 = image.clone();
 			cv.invert(image1);
-//			folder.save(image1, "image1 - inverted");
+			folder.save(image1, "image1 - inverted");
 		
 			// black bg, white loob
 			Mat image2 = new Mat(image.size(), image.type(), black);
 			Imgproc.drawContours(image2, contours, 0, white, -1);
-//			folder.save(image2, "image2 - filled");
+			folder.save(image2, "image2 - filled");
 			
 			Mat image3 = new Mat(image.size(), image.type());
 			Core.multiply(image1, image2, image3);
