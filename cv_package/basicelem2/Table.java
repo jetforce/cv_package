@@ -44,5 +44,19 @@ public class Table extends Type {
 		temp.image = blobImage;
 		blobColumn.add(temp);	
 	}
+	 
+	public ArrayList<Integer> getMarkValues(){
+		return markColumn.markValues;
+	}
+	
+	public void setDecisions(ArrayList<Boolean> decs){
+		markColumn.markDecision = decs;
+	}
+	
+	public void printDecs(){
+		for(int i=0; i< markColumn.markDecision.size(); i++){
+			System.out.println(">> Mark "+ markColumn.markDecision.get(i)+" value "+ markColumn.markValues.get(i) );
+		}
+	}
 	
 }

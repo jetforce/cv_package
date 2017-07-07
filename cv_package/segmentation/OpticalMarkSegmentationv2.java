@@ -63,12 +63,8 @@ public class OpticalMarkSegmentationv2 {
 		int largestChild = getLargestChild(contours,children);
 		double thresh = Imgproc.contourArea(contours.get(largestContour)) / numChoices;
 		
-		
 		Rect boundingRectOfChoices =  Imgproc.boundingRect(contours.get(largestChild));
-		
 		return getAnswers(box.submat(boundingRectOfChoices),numChoices);
-		
-		
 	}
 
 
@@ -84,23 +80,37 @@ public class OpticalMarkSegmentationv2 {
 		
 		List<MatOfPoint> contours = new ArrayList<>();
 		Mat hierarchy = new Mat();
-		Imgproc.findContours(borderless, contours, hierarchy,Imgproc.RETR_TREE,Imgproc.CHAIN_APPROX_SIMPLE);
+		Imgproc.findContours(borderless, contours, hierarchy,Imgproc.RETR_EXTERNAL,Imgproc.CHAIN_APPROX_SIMPLE);
 		
 		contours = filterGroups(contours,numChoices);
-		
-		
-		Mat filled = new Mat(borderless.rows(), borderless.cols(), CvType.CV_8UC1, new Scalar(0));
-		Imgproc.drawContours(filled, contours, -1, new Scalar(255));
-		
-		Imgcodecs.imwrite("whynotworking.jpg",filled);
-		
-		
+			
 		for(int i=0;i< numChoices;i++){
 			temp = Imgproc.boundingRect(contours.get(i));
 			numshade = this.countWhite(borderless.submat(temp));
 			component.addMark(borderless.submat(temp),numshade);	
 		}
 		
+		getDescs(component);
+	}
+
+	
+	public void getDescs(Mark mark){
+		//This one is different from the OMR in table
+		//it uses the first input or "SAMPLE" field
+		//as basis for its thresh
+		
+		double thresh = mark.markValues.get(0) * 0.85;
+		ArrayList<Boolean> decs = new ArrayList<>();
+		
+		for(int i=0; i<mark.markValues.size();i++){
+			
+			if(mark.markValues.get(i) >=thresh){
+				decs.add(true);
+			}else{
+				decs.add(false);
+			}	
+		}
+		mark.markDecision = decs;	
 	}
 	
 	
@@ -126,17 +136,11 @@ public class OpticalMarkSegmentationv2 {
 			answerValues[i] = numshade;
 		}
 		
-		
-		
-		
 		//Imgproc.drawContours(borderless, contours,-1, new Scalar(255),-1);
-		
 		//Imgcodecs.imwrite("noBorder.jpg", borderless);
 		return answerValues;
 	}
 	
-	
-
 	
 	public List<MatOfPoint> filterGroups(List<MatOfPoint> contours, int elementCount) {
 		List<MatOfPoint> contours2 = new ArrayList<>(contours);
@@ -165,15 +169,10 @@ public class OpticalMarkSegmentationv2 {
 		return largest;
 	}
 
-
-
-	
-	
 	
 	public int countWhite(Mat box){
 		
 		int count=0;
-		
 		for(int i=0; i< box.width(); i++){
 			for(int j=0;j<box.height(); j++){
 				if((int) box.get(j, i)[0] == 255){
@@ -185,9 +184,6 @@ public class OpticalMarkSegmentationv2 {
 		return count;
 		
 	}
-	
-	
-	
 	
 }
 

@@ -36,8 +36,9 @@ public class TableSegmentation {
 		Imgproc.findContours(image, contours, new Mat(),Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_NONE);
 		
 		contours =  cv.getLargestContours(contours,2);
-				
 		contours = sort.contourPositions(contours);
+		
+		
 		
 		Rect temp;
 		Mat m;
@@ -79,6 +80,9 @@ public class TableSegmentation {
 		
 		Rect temp;
 		Mat m;
+		//average size is used for the threshold.
+		double averageSize = 0;
+		
 		
 		//the count starts with 1 because the first contour is the border.
 		for(int i=1; i< contours.size(); i++){
@@ -90,14 +94,35 @@ public class TableSegmentation {
 				
 			}else{
 				//OMR
+				m = bh.shrinkPicture(m, .05);
+				averageSize+=m.size().area();
 				tableType.addMark(m, markTools.countWhites(m));	
 			}
 		}
+		averageSize = averageSize / tableType.numRows;
+		this.makeDecision(tableType, averageSize);
 		
 		
 	}
 	
-	
+	//make decisions
+	public void makeDecision(Table table,Double averageSize){
+		
+		double thresh = averageSize * 0.04;
+		
+		ArrayList<Integer> values =  table.getMarkValues();
+		ArrayList<Boolean> decs= new ArrayList<>();
+		
+		for(int i=0; i< values.size(); i++){
+			if(values.get(i) > thresh){
+				decs.add(true);
+			}else{
+				decs.add(false);
+			}
+		}
+		table.setDecisions(decs);
+		
+	}
 	
 	
 	

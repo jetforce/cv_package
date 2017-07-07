@@ -86,7 +86,32 @@ public class ComputerVision {
         return squares;
     }
     
+    public ArrayList<MatOfPoint> getApproxContours(List<MatOfPoint> contours){
+    	
+        MatOfPoint temp;
+        ArrayList<MatOfPoint> squares = new ArrayList<>();
+         
+        for(int i=0; i< contours.size();i++){
+        	temp = this.getApprox(contours.get(i));
+        	squares.add(temp);
+        }
+        return squares;
+    }
     
+    
+    public ArrayList<MatOfPoint> getApproxContours(int hiarchy, Mat image){
+    	
+        MatOfPoint temp;
+        ArrayList<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(image, contours, new Mat(), hiarchy,Imgproc.CHAIN_APPROX_SIMPLE);
+        ArrayList<MatOfPoint> squares = new ArrayList<>();
+               
+        for(int i=0; i< contours.size();i++){
+        	temp = this.getApprox(contours.get(i));
+        	squares.add(temp);
+        }
+        return squares;
+    }
     
     public ArrayList<MatOfPoint> getApproxContours(Mat image, int size){
     	
@@ -98,7 +123,7 @@ public class ComputerVision {
         for(int i=0; i< contours.size();i++){
             if (Imgproc.contourArea(contours.get(i)) > size){
                     temp = this.getApprox(contours.get(i));
-                    contours.add(temp);
+                    squares.add(temp);
             }
         }
         return squares;

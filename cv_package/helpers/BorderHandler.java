@@ -23,8 +23,27 @@ public class BorderHandler {
     public static BorderHandler getInstance() { return bh; }
 	
 	
-	public Mat getBorders(Mat paper){
+	public Mat getBorders(Mat paper, int width, int height){	
+		Mat filled = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
+		Mat filled2 = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
+		Mat result = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
 		
+		Imgproc.morphologyEx(paper, filled, Imgproc.MORPH_OPEN, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(paper.cols()/width,1)));
+		Imgproc.morphologyEx(paper, filled2, Imgproc.MORPH_OPEN, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(1,paper.rows()/height)));
+		
+		Core.add(filled, filled2, result);
+		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_ERODE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1),new Point(-1,-1)));
+		//Imgproc.morphologyEx(m, m, Imgproc.MORPH_DILATE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_RECT, new Size(m.cols(),1), new Point(-1,-1)));
+		return result;
+	}
+    
+    
+    
+    
+    
+    
+    
+	public Mat getBorders(Mat paper){
 		
 		Mat filled = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
 		Mat filled2 = new Mat(paper.rows(), paper.cols(), CvType.CV_8UC1, new Scalar(0));
@@ -40,9 +59,7 @@ public class BorderHandler {
 	}
 	
 	
-	
-	
-	
+		
 	public Mat removeBorder(Mat m){
 		
 		Mat filled = new Mat(m.rows(), m.cols(), CvType.CV_8UC1, new Scalar(255));
@@ -53,7 +70,10 @@ public class BorderHandler {
 		MatOfPoint outline = this.getApprox(contours.get(0));
 		contours.add(outline);
 		//saver.saveImage("scratch",num+"filled", filled);
-		Imgproc.drawContours(filled,contours , 1,new Scalar(0),1);
+		Imgproc.drawContours(filled,contours , -1,new Scalar(0),1);
+		
+		Imgcodecs.imwrite("scratch.jpg", filled);
+		
 		//saver.saveImage("scratch",num+"filledconts", filled);
 		
 		Rect rect = Imgproc.boundingRect(outline);

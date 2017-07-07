@@ -25,7 +25,10 @@ public class Mark extends Type {
 		markValues.add(shade);
 	}
 	
-	
-	
+	public void printDecs(){
+		for(int i=0;i < markValues.size();i++){
+			System.out.println(">> "+ markDecision.get(i) +" "+ markValues.get(i));
+		}
+	}
 	
 }

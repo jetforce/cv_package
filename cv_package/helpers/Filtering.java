@@ -15,6 +15,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import cv_package.basicelem2.Blob;
+import cv_package.segmentation.SmartSegment;
 
 public class Filtering {
 
@@ -44,7 +45,7 @@ public class Filtering {
 		}
 
 //		Imgcodecs.imwrite("Tests/OCR/3 LETTER BORDERES.jpg", image2);
-		Imgcodecs.imwrite("C:/Users/Hannah/Desktop/___chenes.png", image2);
+		Imgcodecs.imwrite("Imdrawingthis.jpg", image2);
 //		Imgcodecs.imwrite("Tests/con"+number+".jpg", image2);
 		
 		return image2;
@@ -56,10 +57,25 @@ public class Filtering {
 //		System.out.println("contours-"+contours2.size());
 		contours2 = contours.subList(0, elementCount);
 		contours2 = sort.contourPositions(contours2);
-		
+		//new SmartSegment().printFormFeatures(contours2);
 		draw(mainImage, contours2, 321);
 		return getImages(mainImage, contours2);
 	}
+    
+    public List<MatOfPoint> largeAreaElementsContours(Mat mainImage, List<MatOfPoint> contours, int elementCount) {
+		List<MatOfPoint> contours2 = new ArrayList<>(contours);
+		contours = sort.contourAreas(contours, sort.ORDER_DESC);
+//		System.out.println("contours-"+contours2.size());
+		contours2 = contours.subList(0, elementCount);
+		contours2 = sort.contourPositions(contours2);
+		//new SmartSegment().printFormFeatures(contours2);
+		draw(mainImage, contours2, 321);
+		return contours2;
+	}
+    
+    
+    
+    
     
     public List<Mat> getImages(Mat image, List<MatOfPoint> elementContours) {
 		List<Mat> elements = new ArrayList<>();
