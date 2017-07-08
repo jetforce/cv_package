@@ -6,14 +6,11 @@ import java.text.SimpleDateFormat;
 
 import org.opencv.core.Mat;
 
-import cv_package.testui.PanelBuilder;
-
 public class Folder {
 
 	private static Images images = Images.getInstance();
 	private static Error error = Error.getInstance();
 	private static Time time = Time.getInstance();
-	private static PanelBuilder pb = PanelBuilder.getInstance();
 	
 	private static Folder folder = new Folder();
     public static Folder getInstance() { return folder; }

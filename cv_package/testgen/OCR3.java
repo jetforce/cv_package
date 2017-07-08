@@ -33,7 +33,7 @@ import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package. helpers.Sorting;
 
-public class OCR{
+public class OCR3{
 
 	private static HandwrittenDigitClassifier digitClassifier = HandwrittenDigitClassifier.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
@@ -51,89 +51,27 @@ public class OCR{
 	private static Size STANDARD_RESIZE = new Size(STANDARD_LEN, STANDARD_LEN);
 	private static int STARTING_POINT = STANDARD_LEN - CHAR_LEN;
 
-    private static OCR ocr = new OCR();
-    public static OCR getInstance() { return ocr; }
-    private OCR() { } 
+    private static OCR3 ocr = new OCR3();
+    public static OCR3 getInstance() { return ocr; }
+    private OCR3() { } 
       
-    public String gooString(Text comp) throws IOException {
-    	ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
-		String numStr = "";
+    public ArrayList<String> go(Text comp, CharacterClassifier classifier) throws IOException {
+		ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
+		ArrayList<String> digits = new ArrayList<>();
 		
 		for(Mat c:characterMats) {
 			String digit;
 			if(c == null) {
-				digit = "~";
+				digit = " ";
 			}
 			else {
 				String imagepath = folder.save(c);
-				digit = digitClassifier.classify(imagepath) + "";
-			}
-//			time.stamp("digit: " + digit);
-			numStr += digit;
-		}
-		
-		return numStr;
-	}
-    
-    public ArrayList<Integer> gooArray(Text comp) throws IOException {
-		ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
-		ArrayList<Integer> digits = new ArrayList<>();
-		
-		for(Mat c:characterMats) {
-			int digit;
-			if(c == null) {
-				digit = NEG_VALUE;
-			}
-			else {
-				String imagepath = folder.save(c);
-				digit = digitClassifier.classify(imagepath);
+				digit = classifier.classify(c) + "";
 			}
 			digits.add(digit);
 		}
 		
 		return digits;
-	}
-    
-    public long goo(Text comp) throws IOException {
-		ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
-		String numStr = "";
-		
-		for(Mat c:characterMats) {
-			String digit;
-			if(c == null) {
-				digit = "~";
-			}
-			else {
-				String imagepath = folder.save(c);
-				digit = digitClassifier.classify(imagepath) + "";
-			}
-//			time.stamp("digit: " + digit);
-			numStr += digit;
-		}
-		
-		long number = Long.parseLong(numStr);
-		return number;
-	}
-    
-    public int go(Mat img, int characterCount) throws IOException {
-		ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(img, characterCount));
-		String numStr = "";
-		
-		for(Mat c:characterMats) {
-			String imagepath = folder.save(c);
-			String digit = digitClassifier.classify(c) + "";
-			time.stamp("digit: " + digit);
-			numStr += digit;
-		}
-		
-		int number = Integer.parseInt(numStr);
-		return number;
-	}
-    
-	public void go(Text comp) {
-	
-		comp.characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
-		// recognize
 	}
 	
 	public boolean hasCharacter(List<MatOfPoint> contours) {
@@ -162,23 +100,6 @@ public class OCR{
 		
 		return hasChar;
 	}
-	
-	
-	
-	
-
-	// MAT (output) contains a char - biggest contour in its box - A
-	/*
-	public Mat getMatChar(Mat image) {
-		image = filter.removeBackground(image);
-		List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL);	
-		contours = sort.contourAreas(contours, sort.ORDER_DESC);
-		Rect charRect = Imgproc.boundingRect(contours.get(0));
-		return image.submat(charRect);
-	}
-
-	*/
-
 
 	public boolean isCharacter(MatOfPoint largestContour) {
 		boolean isChar = true;

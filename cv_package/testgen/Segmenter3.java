@@ -5,10 +5,15 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
@@ -28,25 +33,17 @@ import cv_package.basicelem2.Blob;
 import cv_package.filereader.FormFileReader2;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
+import cv_package.helpers.Sorting;
 
-public class Segmenter2 {
-
-//	String testpath = "C:/Users/Hannah/Desktop/Test-Images";
-//	String testpath_form = "C:/Users/Hannah/Desktop/form-B.txt";
-//	String testpath_form = "Eto na talaga/form-B.txt";
-//	String testpath_form = "C:/Users/Hannah/Desktop/here we go/form structures/1.txt";
+public class Segmenter3 {
 
 	private static Filtering filter = Filtering.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
-	private static OCR ocr = OCR.getInstance();
+	private static OCR3 ocr = OCR3.getInstance();
 	private static OMR omr = OMR.getInstance();
 	private static Folder folder = Folder.getInstance();
-	private static HandwrittenDigitClassifier hdc = HandwrittenDigitClassifier.getInstance();
 	private static Time time = Time.getInstance();
-
-	private int NEG_VALUE = -1;
-	private int FORM_NUM_COUNT = 1;
-	private int PATIENT_NUM_COUNT = 6;
+	private CharacterClassifier classifier;
 	
 	Form form;
 	
@@ -54,7 +51,7 @@ public class Segmenter2 {
 	
 	private Mat img;
 	
-	public Segmenter2() {
+	public Segmenter3() {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 	}
 	
@@ -68,32 +65,62 @@ public class Segmenter2 {
 //		time.stamp("digit model done loading");
 //	}
 	
-	public void init(String filepath, boolean isSaving, LocalPrinter printer) throws IOException {
+	public void init(String filepath, boolean isSaving, LocalPrinter printer, CharacterClassifier classifier) throws IOException {
 		this.filepath = filepath.replace("\\", "/");
 
 		folder.setSaving(isSaving);
 		folder.init();
-		hdc.init();
+//		hdc.init();
 		time.setPrinter(printer);
 		time.start();
 		time.stamp("digit model done loading");
+		
+		this.classifier = classifier;
 		
 		img = Imgcodecs.imread(filepath);
 	}
 	
-	public void init(Mat image, boolean isSaving, LocalPrinter printer) throws IOException {
+	public void init(Mat image, boolean isSaving, LocalPrinter printer, CharacterClassifier classifier) throws IOException {
 //		this.filepath = filepath.replace("\\", "/");
 
 		folder.setSaving(isSaving);
 		folder.init();
-		hdc.init();
+//		hdc.init();
 		time.setPrinter(printer);
 		time.start();
 		time.stamp("digit model done loading");
+
+		this.classifier = classifier;
 		
 		img = image;
 	}
 	
+//	public void init(String filepath, boolean isSaving, LocalPrinter printer) throws IOException {
+//		this.filepath = filepath.replace("\\", "/");
+//
+//		folder.setSaving(isSaving);
+//		folder.init();
+////		hdc.init();
+//		time.setPrinter(printer);
+//		time.start();
+//		time.stamp("digit model done loading");
+//		
+//		img = Imgcodecs.imread(filepath);
+//	}
+//	
+//	public void init(Mat image, boolean isSaving, LocalPrinter printer) throws IOException {
+////		this.filepath = filepath.replace("\\", "/");
+//
+//		folder.setSaving(isSaving);
+//		folder.init();
+////		hdc.init();
+//		time.setPrinter(printer);
+//		time.start();
+//		time.stamp("digit model done loading");
+//		
+//		img = image;
+//	}
+//	
 	public void initForm() {		
 		FormFileReader2 reader = new FormFileReader2();
 		form = new Form();
@@ -103,72 +130,53 @@ public class Segmenter2 {
 	public void segment() throws IOException {
 		folder.save(img, "ORIG");
 		
-    	cv.preprocess2(img);
+    	cv.preprocess(img);
     	folder.save(img, "PREPROC");
 		
-		ArrayList<Mat> divisions = filter.divideImage(img, 2);
-		Mat getbetter = divisions.get(0);		
-		Mat main = divisions.get(1);
-		
-		folder.save(getbetter);
-		folder.save(main);
-		
-//		time.stamp("form number extracting..");
+    	Mat formNumMat = getFormNumberMat(img);
+    	int formNum = classifier.classifyDigit(formNumMat);
+    	
+    	folder.save(formNumMat, "formnummat");
+    	folder.save(img, "image after get formnum");
+    	
+		time.stamp("form number extracting..");
 //		int formNumber = getFormNumber(getbetter);
 //		structpath = folder.getStructPath(formNumber);
-		structpath = "C:/Users/Hannah/Desktop/form.txt";
+		structpath = folder.getStructPath(1);
 		initForm();
 //		form.formNumber = formNumber;
-//		time.stamp("form init done..");
+		time.stamp("form init done..");
 		
-		main = filter.removeOutlineFinal(main);
-		form.image = main;
-
-		folder.save(main, "removed");
-
+		form.image = img;
 		go(form.image, form.components);
 
 		time.end();
 	}
 	
-	private int getFormNumber(Mat image) throws IOException {
-		ArrayList<Mat> infoMat = (ArrayList<Mat>) 
-				filter.largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), 1);
-
-		Mat formNumMat = infoMat.get(0);
+	private Mat getFormNumberMat(Mat image) {
+		List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL);
 		
+		Sorting sort = Sorting.getInstance();
+		contours = sort.contourPositions(contours);
+		
+		MatOfPoint formNumCont = contours.get(0);
+		
+		Rect rect = Imgproc.boundingRect(formNumCont);
+		
+		Mat formNumMat = null;
+		formNumMat = image.submat(rect);
 		cv.invert(formNumMat);
+		formNumMat = filter.removeOutlineChar(formNumMat);
 		
-		folder.save(formNumMat, "form");
+		int start = rect.y + rect.height + 10;
+		time.stamp("start: "+start);
+		time.stamp("rows: "+image.rows());
+		time.stamp("cols: "+image.cols());
+		img = image.submat(start, image.rows(), 0, image.cols());
 
-		int formNumber = ocr.go(formNumMat, 1);
-		time.stamp("Form Number: " + formNumber);
-		
-		return formNumber;
+		return formNumMat;
 	}
-//	
-//	private void getPrimaryInfo(Mat image) throws IOException {
-//
-//		ArrayList<Mat> infoMat = (ArrayList<Mat>) 
-//				filter.largeAreaElements(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), 2);
-//
-//		Mat patientNumMat = infoMat.get(0);
-//		Mat formNumMat = infoMat.get(1);
-//
-//		folder.save(patientNumMat, "patient");
-//		folder.save(formNumMat, "form");
-//
-//		hdc.init();
-////		hdc.test();
-//		
-//		int patientNumber = ocr.go(patientNumMat, PATIENT_NUM_COUNT);
-//		time.stamp("Patient Number: " + patientNumber);
-//		
-//		int formNumber = ocr.go(formNumMat, FORM_NUM_COUNT);
-//		time.stamp("Form Number: " + formNumber);
-//		
-//	}
-//	
+	
 	private void go(Mat image, ArrayList<Type> components) throws IOException {
 		
 		List<Mat> mats = filter.largeAreaElements
@@ -186,8 +194,10 @@ public class Segmenter2 {
 			switch(c.typename) {
 			case "TEXT": 
 //				long num = ocr.goo((Text)c); 
-				String num = ocr.gooString((Text)c);
-				time.stamp("num: "+num);
+//				String num = ocr.gooString((Text)c);
+//				time.stamp("num: "+num);
+				ArrayList<String> chars = ocr.go((Text)c, classifier);
+				time.stamp("string: "+Arrays.toString(chars.toArray()));
 				break;
 			case "MARK": omr.go((Mark)c); break;
 			case "BLOB": goBlob((Blob)c, mats.get(index)); break;
@@ -204,31 +214,5 @@ public class Segmenter2 {
 		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
 		comp.image = img;
     }
-	
-//	public void save(Mat img, String label) {
-//		String imagepath = images.save(img);
-//		String timediff = time.stamp(images.getCountStr() + " - " + label);
-//		pb.addImage(label + " - " + timediff, imagepath);
-//	}
-	
-//	public Form createForm() {
-//		FormFileReader2 reader = new FormFileReader2();
-//		Form form = new Form();
-//		reader.readToForm(path, form);
-//		return form;
-//	}
-	
-//	public void createFolder() {
-//		SimpleDateFormat sdf = new SimpleDateFormat("MM.dd.HH.mm.ss");
-//		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-//		testpath += File.separator + sdf.format(timestamp);
-//		new File(testpath).mkdir();
-//	}
-//	
-//	public String save(String name, Mat img) {
-//		String path = testpath+File.separator+name+".png";
-//		Imgcodecs.imwrite(path, img);
-//		return path;
-//	}
 	
 }

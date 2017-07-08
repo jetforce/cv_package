@@ -12,7 +12,10 @@ import cv_package.debug.LocalPrinter;
 import cv_package.debug.Printer;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
+import cv_package.testgen.CharacterClassifier;
 import cv_package.testgen.Segmenter2;
+import cv_package.testgen.Segmenter3;
+import cv_package.testgen.TemporaryClassifier;
 
 public class TestProgram {
 
@@ -51,14 +54,15 @@ public class TestProgram {
 	}
 	
 	public void test() throws IOException {
-		Segmenter2 s = new Segmenter2();
-//		String filepath = "C:/Users/Hannah/Desktop/formtest5.png";
+		Segmenter3 s = new Segmenter3();
+		String filepath = "C:/Users/Hannah/Desktop/formtest6.png";
 //		String structpath = "C:/Users/Hannah/Desktop/form-B.txt";
-				String filepath = "C:/Users/Hannah/Desktop/ft6.jpg";
-				String structpath = "C:/Users/Hannah/Desktop/form.txt";
-		boolean isSaving = true;
+//				String filepath = "C:/Users/Hannah/Desktop/ft6.jpg";
+//				String structpath = "C:/Users/Hannah/Desktop/form.txt";
+		boolean isSaving = false;
 		LocalPrinter printer = new Printer();
-		s.init(filepath, isSaving, printer);
+		CharacterClassifier classifier = new TemporaryClassifier();
+		s.init(filepath, isSaving, printer, classifier);
 		s.segment();
 		
 //		folder.init();
