@@ -25,15 +25,19 @@ import cv_package.basicelem2.Set;
 import cv_package.basicelem2.Text;
 import cv_package.basicelem2.Type;
 import cv_package.debug.LocalPrinter;
+import cv_package.debug.Printer;
+import cv_package.debug.Saver;
 import cv_package.dumps.Error;
 import cv_package.dumps.Folder;
 import cv_package.dumps.Images;
 import cv_package.dumps.Time;
 import cv_package.basicelem2.Blob;
 import cv_package.filereader.FormFileReader2;
+import cv_package.helpers.BorderHandler;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
+import cv_package.paperextractorv2.FourCornerBoxv4;
 
 public class Segmenter3 {
 
@@ -130,9 +134,14 @@ public class Segmenter3 {
 	public void segment() throws IOException {
 		folder.save(img, "ORIG");
 		
+    	FourCornerBoxv4 extract = new FourCornerBoxv4(new Saver(),new Printer());
+		img = extract.extractPaper(img);
+		
     	cv.preprocess(img);
     	folder.save(img, "PREPROC");
 		
+    	Imgcodecs.imwrite("Here.jpg", img);
+    	
     	Mat formNumMat = getFormNumberMat(img);
     	int formNum = classifier.classifyDigit(formNumMat);
     	
@@ -142,19 +151,26 @@ public class Segmenter3 {
 		time.stamp("form number extracting..");
 //		int formNumber = getFormNumber(getbetter);
 //		structpath = folder.getStructPath(formNumber);
-		structpath = folder.getStructPath(1);
+		//structpath = folder.getStructPath(1);
+		
+		structpath = "input2/1.txt";
 		initForm();
 //		form.formNumber = formNumber;
 		time.stamp("form init done..");
 		
 		form.image = img;
 		go(form.image, form.components);
-
+		
 		time.end();
 	}
 	
 	private Mat getFormNumberMat(Mat image) {
-		List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL);
+		//List<MatOfPoint> contours = cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL);
+		List<MatOfPoint> contours =  cv.getSquareContours(image, 200, Imgproc.RETR_EXTERNAL);
+		
+		System.out.println("Contours size "+contours.size());
+		
+		
 		
 		Sorting sort = Sorting.getInstance();
 		contours = sort.contourPositions(contours);
@@ -179,8 +195,23 @@ public class Segmenter3 {
 	
 	private void go(Mat image, ArrayList<Type> components) throws IOException {
 		
+		
+		BorderHandler border = new BorderHandler();
+		Mat location = border.getBorders(image, 80, 80);
+		
+		Imgcodecs.imwrite("TheLocation.jpg",location);
+		
+		
 		List<Mat> mats = filter.largeAreaElements
-				(image.clone(), cv.findContours(image.clone(), Imgproc.RETR_EXTERNAL), components.size());
+				(image.clone(), cv.findContours(location, Imgproc.RETR_EXTERNAL), components.size());
+		
+		int j=0;
+		for(Mat m:mats){
+			Imgcodecs.imwrite(j+"duh.jpg", mats.get(j));
+			j++;
+		}
+		
+		
 		
 		int index = 0;
 		

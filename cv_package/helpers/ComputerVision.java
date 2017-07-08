@@ -79,6 +79,23 @@ public class ComputerVision {
     	 Imgproc.GaussianBlur(image, image,new Size(45,45), 0);
     }
     
+    public ArrayList<MatOfPoint> getSquareContours(Mat image, int size, int hierchy){
+        MatOfPoint temp;
+        ArrayList<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.findContours(image, contours, new Mat(), hierchy,Imgproc.CHAIN_APPROX_SIMPLE);
+        ArrayList<MatOfPoint> squares = new ArrayList<>();
+        
+       
+        for(int i=0; i< contours.size();i++){
+            if (Imgproc.contourArea(contours.get(i)) > size){
+                    temp = this.getSquareApprox(contours.get(i));
+                    if(temp!=null){
+                        squares.add(temp);
+                    }
+            }
+        }
+        return squares;
+    }
     
     public ArrayList<MatOfPoint> getSquareContours(Mat image, int size){
         MatOfPoint temp;
