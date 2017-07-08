@@ -7,9 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import org.bytedeco.javacpp.opencv_core.Mat;
+
 import cv_package.basicelem2.Blob;
 import cv_package.basicelem2.Form;
 import cv_package.basicelem2.Mark;
+import cv_package.basicelem2.Table;
 import cv_package.basicelem2.Text;
 import cv_package.basicelem2.Type;
 
@@ -37,6 +40,7 @@ public class FormFileReader2 {
 	}
 	
 	public ArrayList<Type> getComponents(ArrayList<String> lines) {
+		
 		ArrayList<Type> components = new ArrayList<>();
 		
 		for(String l:lines) {
@@ -71,7 +75,11 @@ public class FormFileReader2 {
 //				System.out.println("BLOB");
 //				System.out.println("  label: " + b.label);
 				break;
-				
+			
+			case "TABLE":
+				Table table = readTypeTable(words);
+				components.add(table);
+				break;
 			default: 
 				System.out.println("Error first word");
 				
@@ -79,6 +87,21 @@ public class FormFileReader2 {
 		}
 		
 		return components;
+	}
+
+	public Table readTypeTable(ArrayList<String> words) {
+		// -2 because index 0 is "TABLE"
+		//index 1 is the label
+		
+		Table table = new Table(words.size()-2);
+		table.label =  cleanlabel(words.get(1));
+		
+		int size = words.size();
+		if(size > 2) {
+			table.setMarkLabels(new ArrayList<String>(words.subList(2, size)));
+		}
+		
+		return table;
 	}
 
 	public Blob readTypeBlob(ArrayList<String> words) {
@@ -99,6 +122,7 @@ public class FormFileReader2 {
 		
 		int size = words.size();
 		if(size > 2) {
+			mark.choices = size-2;
 			mark.labels = new ArrayList<String>(words.subList(2, size));
 		}
 		

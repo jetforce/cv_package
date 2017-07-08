@@ -27,6 +27,11 @@ public class Table extends Type {
 		blobColumn = new ArrayList<>();
 	}
 	
+	public void setMarkLabels(ArrayList<String> labels){
+		markColumn.labels = labels;
+	}
+	
+	
 	public Mat getMarkBlob(int row){
 		return markColumn.markMats.get(row);	
 	}
