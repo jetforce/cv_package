@@ -55,9 +55,9 @@ public class FourCornerBoxv4 {
         
         //t.start();
         //this.saver.saveImage("original",normalizer.beforeTouching);
-        this.saver.saveImage("marked",normalizer.marked);
-        this.saver.saveImage("Thresh",normalizer.thresholded);
-        this.saver.saveImage("normal",paper);
+        //this.saver.saveImage("marked",normalizer.marked);
+        //this.saver.saveImage("Thresh",normalizer.thresholded);
+        //this.saver.saveImage("normal",paper);
         //t.stop();
         
         //output = ComputerVisionUtility.convertToBitmap(paper);

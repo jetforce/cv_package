@@ -1,3 +1,4 @@
+/*
 package cv_package.testgen;
 
 import java.io.File;
@@ -38,10 +39,10 @@ public class Segmenter2 {
 
 	private static Filtering filter = Filtering.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
-	private static OCR ocr = OCR.getInstance();
+	//private static OCR ocr = OCR.getInstance();
 	private static OMR omr = OMR.getInstance();
 	private static Folder folder = Folder.getInstance();
-	private static HandwrittenDigitClassifier hdc = HandwrittenDigitClassifier.getInstance();
+	//private static HandwrittenDigitClassifier hdc = HandwrittenDigitClassifier.getInstance();
 	private static Time time = Time.getInstance();
 
 	private int NEG_VALUE = -1;
@@ -232,3 +233,4 @@ public class Segmenter2 {
 //	}
 	
 }
+*/

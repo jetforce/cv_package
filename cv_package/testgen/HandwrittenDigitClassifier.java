@@ -1,3 +1,4 @@
+/*
 package cv_package.testgen;
 
 import java.awt.image.BufferedImage;
@@ -19,6 +20,7 @@ import org.nd4j.linalg.dataset.api.preprocessor.ImagePreProcessingScaler;
 import org.opencv.core.Mat;
 
 import cv_package.dumps.Time;
+
 
 public class HandwrittenDigitClassifier {
 
@@ -111,3 +113,5 @@ public class HandwrittenDigitClassifier {
 		return maxIndex;
 	}
 }
+*/
+

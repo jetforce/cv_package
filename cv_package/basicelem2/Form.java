@@ -15,8 +15,7 @@ import cv_package.helpers.BorderHandler;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.Filtering;
 import cv_package.segmentation.TableSegmentation;
-import cv_package.testgen.OCR;
-import cv_package.testgen.OMR;
+
 import cv_package.segmentation.OpticalMarkSegmentationv2;
 import cv_package.debug.*;
 
@@ -38,7 +37,7 @@ public class Form {
 //			go();
 //	}
 
-	OCR ocr = OCR.getInstance();
+	//OCR ocr = OCR.getInstance();
 	OpticalMarkSegmentationv2  omr = new OpticalMarkSegmentationv2(new Saver());
 	TableSegmentation ts = TableSegmentation.getInstance();
 	BorderHandler borders = new BorderHandler();

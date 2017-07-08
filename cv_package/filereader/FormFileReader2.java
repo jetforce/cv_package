@@ -2,12 +2,11 @@ package cv_package.filereader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-
-import org.bytedeco.javacpp.opencv_core.Mat;
 
 import cv_package.basicelem2.Blob;
 import cv_package.basicelem2.Form;
@@ -21,7 +20,28 @@ public class FormFileReader2 {
 	private String NEWLINE = "\n";
 	private String UNDERSCORE = "_";
 	private String SPACE = " ";
-	
+
+
+	public void readToForm(InputStream file, Form form) {
+		try {
+
+			Scanner text = new Scanner(file);
+			ArrayList<String> lines = linesplit(text, NEWLINE);
+			ArrayList<Type> components = getComponents(lines);
+
+			form.components = components;
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
+
 	public void readToForm(String filename, Form form) {
 		try {
 			

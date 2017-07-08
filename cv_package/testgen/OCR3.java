@@ -1,6 +1,7 @@
+
 package cv_package.testgen;
 
-import java.awt.Image;
+
 import cv_package.basicelem2.Text;
 import cv_package.dumps.Folder;
 import cv_package.dumps.Time;
@@ -35,7 +36,7 @@ import cv_package. helpers.Sorting;
 
 public class OCR3{
 
-	private static HandwrittenDigitClassifier digitClassifier = HandwrittenDigitClassifier.getInstance();
+	//private static HandwrittenDigitClassifier digitClassifier = HandwrittenDigitClassifier.getInstance();
 	private static ComputerVision cv = ComputerVision.getInstance();
 	private static Sorting sort = Sorting.getInstance();
 	private static Filtering filter = Filtering.getInstance();
