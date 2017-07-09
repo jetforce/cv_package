@@ -22,6 +22,8 @@ public class Time {
 	private ArrayList<String> times = new ArrayList<>();
 	
 	private LocalPrinter printer;
+
+	private String TAG = "TEST_TIME";
     
 	public void setPath(String path) {
 		this.path = path;
@@ -39,7 +41,7 @@ public class Time {
     	String str = currTimeStr + "  Start";
     	times.add(str);
     	
-    	printer.print("time", str);
+    	printer.print(TAG, str);
 //     	saveTime(str);
     }
     
@@ -57,7 +59,7 @@ public class Time {
      	String diff = getDiffMilli(before, now)+"";
      	String str = currTimeStr + "  " + label + " (" + diff + "mil)";
      	times.add(str);
-     	printer.print("time", str);
+     	printer.print(TAG, str);
 //     	System.out.println(str);
 //     	saveTime(str);
      	before = now;
@@ -70,7 +72,7 @@ public class Time {
      	String str = currTimeStr + "  " + label + " (" + getDiffMilli(before, now) + "mil)";
      	times.add(str);
 //     	System.out.println(str);
-     	printer.print("time", str);
+     	printer.print(TAG, str);
 //     	saveTime(str);
      	before = now;
      	

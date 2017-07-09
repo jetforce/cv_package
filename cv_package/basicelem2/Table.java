@@ -11,10 +11,10 @@ public class Table extends Type {
 	// Blob being the 2nd Column
 	
 	//This is the first OMR column
-	private Mark markColumn;
+	public  Mark markColumn;
 	
 	//this the 2nd Blob Column
-	private ArrayList<Blob> blobColumn = new ArrayList<>();
+	public ArrayList<Blob> blobColumn = new ArrayList<>();
 	
 	//Number of Rows
 	public int numRows;

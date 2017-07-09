@@ -1,13 +1,17 @@
 package cv_package.testgen;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Environment;
 
 import com.virtusio.sibayan.formcreatormodule.PrototypeActivity;
+import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
 import com.virtusio.sibayan.image_process.helpers.ImageSaver;
 import com.virtusio.sibayan.image_process.helpers.Logger;
 import com.virtusio.sibayan.thesis_project.R;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -92,7 +96,7 @@ public class Segmenter3 {
 //		hdc.init();
 		time.setPrinter(printer);
 		time.start();
-		time.stamp("digit model done loading");
+//		time.stamp("digit model done loading");
 		
 		this.classifier = classifier;
 		
@@ -107,7 +111,7 @@ public class Segmenter3 {
 //		hdc.init();
 		time.setPrinter(printer);
 		time.start();
-		time.stamp("digit model done loading");
+//		time.stamp("digit model done loading");
 
 		this.classifier = classifier;
 		
@@ -158,24 +162,46 @@ public class Segmenter3 {
 	public Form segment(Context context) throws IOException {
 		//folder.save(img, "ORIG");
 		//Change this to change text file
-		InputStream is = context.getResources().openRawResource(R.raw.w3);
+
+//		tempsave("_before 4 corn", img);
 		FourCornerBoxv4 extract = new FourCornerBoxv4(new ImageSaver("Output",context),new Logger());
+		Size sz = new Size(1494,2656);
+		Imgproc.resize( img, img, sz );
 		img = extract.extractPaper(img);
+
+
+//		tempsave("_after 4 corn", img);
 
 		cv.preprocess(img);
 		//folder.save(img, "PREPROC");
 
+//		tempsave("_preroc", img);
+
+		time.stamp("form number extracting..");
 		Mat formNumMat = getFormNumberMat(img);
 		int formNum = classifier.classifyDigit(formNumMat);
+		InputStream is = null;
+		switch(formNum){
+			case 1: is = context.getResources().openRawResource(R.raw.w1); break;
+			case 2: is = context.getResources().openRawResource(R.raw.w2); break;
+			case 3: is = context.getResources().openRawResource(R.raw.w3); break;
+		}
+
 
 		//folder.save(formNumMat, "formnummat");
 		//folder.save(img, "image after get formnum");
 
-		time.stamp("form number extracting..");
 
 		initForm(is);
-//		form.formNumber = formNumber;
+
+		form.formNumber = formNum;
 		time.stamp("form init done..");
+		time.stamp("form number:" + formNum);
+
+//		tempsave("_formnum", formNumMat);
+//		tempsave("_img", img);
+
+		time.stamp("tempsave done");
 
 		form.image = img;
 		go(form.image, form.components);
@@ -184,7 +210,37 @@ public class Segmenter3 {
 		return form;
 	}
 
-
+//	public void tempsave(String filename, Mat mat) {
+//
+//		String root = Environment.getExternalStorageDirectory().toString() + "/CONVERTER";
+//		File myDir = new File(root);
+//		myDir.mkdirs();
+//
+//		String fname = filename+ ".jpg";
+//		File file = new File(myDir, fname);
+//		if (file.exists()) file.delete();
+//
+//		ComputerVisionUtility cv = new ComputerVisionUtility();
+//		Bitmap bmp = cv.convertToBitmap(mat);
+//		FileOutputStream out = null;
+//		try {
+//			out = new FileOutputStream(file);
+//			bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+//			// PNG is a lossless format, the compression factor (100) is ignored
+//			out.flush();
+//			out.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if (out != null) {
+//					out.close();
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 
 
 
@@ -242,10 +298,12 @@ public class Segmenter3 {
 		formNumMat = filter.removeOutlineChar(formNumMat);
 		
 		int start = rect.y + rect.height + 10;
-		time.stamp("start: "+start);
-		time.stamp("rows: "+image.rows());
-		time.stamp("cols: "+image.cols());
+//		time.stamp("start: "+start);
+//		time.stamp("rows: "+image.rows());
+//		time.stamp("cols: "+image.cols());
 		img = image.submat(start, image.rows(), 0, image.cols());
+
+		cv.invert(formNumMat);
 
 		return formNumMat;
 	}
@@ -274,7 +332,11 @@ public class Segmenter3 {
 //				long num = ocr.goo((Text)c); 
 //				String num = ocr.gooString((Text)c);
 //				time.stamp("num: "+num);
+
 				ArrayList<String> chars = ocr.go((Text)c, classifier);
+				String str = getArrayToString(chars);
+				((Text)c).setText(str);
+				((Text)c).setText(str);
 				time.stamp("string: "+Arrays.toString(chars.toArray()));
 				break;
 			case "MARK": omr.go((Mark)c); break;
@@ -287,10 +349,20 @@ public class Segmenter3 {
 			
 		}
 	}
+
+	public String getArrayToString(ArrayList<String> chars) {
+		String s = "";
+		for(String c: chars) {
+			s += c;
+		}
+		return s;
+	}
 	
 	public void goBlob(Blob comp, Mat img) {
-    	img = filter.removeOutline2(img); 
-		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV); 	
+//    	img = filter.removeOutline2(img);
+//		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV);
+		img = filter.removeBackground(img);
+		cv.invert(img);
 		comp.image = img;
     }
 	

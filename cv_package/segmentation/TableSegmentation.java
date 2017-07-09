@@ -1,5 +1,7 @@
 package cv_package.segmentation;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +73,9 @@ public class TableSegmentation {
 		Mat blank = new Mat(subImage.rows(), subImage.cols(), CvType.CV_8UC1, new Scalar(0));
 		List<MatOfPoint> contours = new ArrayList<>();
 		Imgproc.findContours(borders, contours, new Mat(),Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
-		
+
+		Log.d("HANNAH", "size of contours of table "+ contours.size());
+
 		//Always add one to consider the biggest square containing everything 
 		//Num Rows times 2 because there are two columns.
 		//For now it only supports 2 columns change in the future please

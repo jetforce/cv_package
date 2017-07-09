@@ -9,10 +9,17 @@ public class Text extends Type {
 	public int characterCount;
 	public String type;
 	public ArrayList<Mat> characterMats;
-	
+
+//	public String text= "asddffghjklaaaazxcvnm";
+	public String text;
+
 	public Text() {
 		typename = "TEXT";
 		characterMats = new ArrayList<>();
 	}
-	
+
+	public void setText(String txt){
+		this.text = txt;
+	}
+
 }

@@ -16,4 +16,19 @@ public class TemporaryClassifier implements CharacterClassifier {
 		return 1;
 	}
 
+	@Override
+	public int classifyNum(Mat image) {
+		return 0;
+	}
+
+	@Override
+	public char classifyAlpha(Mat image) {
+		return 0;
+	}
+
+	@Override
+	public char classifyAlphaNum(Mat image) {
+		return 0;
+	}
+
 }

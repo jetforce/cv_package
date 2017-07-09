@@ -2,6 +2,11 @@
 package cv_package.testgen;
 
 
+import android.graphics.Bitmap;
+import android.os.Environment;
+
+import com.virtusio.sibayan.image_process.helpers.ComputerVisionUtility;
+
 import cv_package.basicelem2.Text;
 import cv_package.dumps.Folder;
 import cv_package.dumps.Time;
@@ -58,22 +63,67 @@ public class OCR3{
       
     public ArrayList<String> go(Text comp, CharacterClassifier classifier) throws IOException {
 		ArrayList<Mat> characterMats = new ArrayList<>(getMatListCharsClean(comp.image, comp.characterCount));
-		ArrayList<String> digits = new ArrayList<>();
-		
+		ArrayList<String> chars = new ArrayList<>();
+
+		int x=0;
 		for(Mat c:characterMats) {
-			String digit;
+			String temp = " ";
+
+
+//			tempsave("_"+x,c); x++;
+
 			if(c == null) {
-				digit = " ";
+				temp = " ";
 			}
 			else {
+				cv.invert(c);
 				String imagepath = folder.save(c);
-				digit = classifier.classify(c) + "";
+//				temp = classifier.classify(c) + "";
+
+				switch(comp.type) {
+					case "ALPHA": temp = classifier.classifyAlpha(c) + ""; break;
+					case "NUM": temp = classifier.classifyNum(c) + ""; break;
+					case "ALPHANUM": temp = classifier.classifyAlphaNum(c) + "";
+				}
+
 			}
-			digits.add(digit);
+			chars.add(temp);
 		}
 		
-		return digits;
+		return chars;
 	}
+
+//	public void tempsave(String filename, Mat mat) {
+//
+//		String root = Environment.getExternalStorageDirectory().toString() + "/CONVERTER";
+//		File myDir = new File(root);
+//		myDir.mkdirs();
+//
+//		String fname = filename+ ".jpg";
+//		File file = new File(myDir, fname);
+//		if (file.exists()) file.delete();
+//
+//		ComputerVisionUtility cv = new ComputerVisionUtility();
+//		Bitmap bmp = cv.convertToBitmap(mat);
+//		FileOutputStream out = null;
+//		try {
+//			out = new FileOutputStream(file);
+//			bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+//			// PNG is a lossless format, the compression factor (100) is ignored
+//			out.flush();
+//			out.close();
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if (out != null) {
+//					out.close();
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 	
 	public boolean hasCharacter(List<MatOfPoint> contours) {
 		boolean hasChar = true;
@@ -121,7 +171,7 @@ public class OCR3{
 		
 		int imgH = image.rows(), imgW = image.cols();
 		int padding;
-		int border = 7;
+		int border = 2;
 		int cH = charRect.height, cW = charRect.width;
 		int cX = charRect.x, cY = charRect.y;
 		int rowS, rowE, colS, colE;
@@ -154,9 +204,9 @@ public class OCR3{
 		
 		image = image.submat(rowS, rowE, colS, colE);
 		
-		Imgproc.resize(image, image, CHAR_SIZE);
+//		Imgproc.resize(image, image, CHAR_SIZE);
 		
-		Imgproc.morphologyEx(image, image, Imgproc.MORPH_CLOSE, Mat.ones(2, 2, CvType.CV_8UC1));
+//		Imgproc.morphologyEx(image, image, Imgproc.MORPH_CLOSE, Mat.ones(2, 2, CvType.CV_8UC1));
 		
 		return image;
 	}
@@ -224,8 +274,8 @@ public class OCR3{
 //		//
 //		
 		Mat image2 = new Mat();
-		Size size = new Size(50,50);
-		Imgproc.resize(image, image2, size);
+//		Size size = new Size(50,50);
+		Imgproc.resize(image, image2, CHAR_SIZE);
 		
 		filter.drawBorder(image2, new Scalar(0), 1);
 		
