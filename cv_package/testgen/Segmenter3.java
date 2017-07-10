@@ -361,7 +361,8 @@ public class Segmenter3 {
 	public void goBlob(Blob comp, Mat img) {
 //    	img = filter.removeOutline2(img);
 //		Imgproc.threshold(img, img, 100, 255, Imgproc.THRESH_BINARY_INV);
-		img = filter.removeBackground(img);
+		//img = filter.removeBackground(img);
+        img =  filter.removeOutlineChar(img);
 		cv.invert(img);
 		comp.image = img;
     }
