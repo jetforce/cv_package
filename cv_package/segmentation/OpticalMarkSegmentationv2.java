@@ -74,7 +74,8 @@ public class OpticalMarkSegmentationv2 {
 		int numChoices = component.choices;
 		
 		
-		Mat borderless = bh.removeBorder(image);
+		//Mat borderless = bh.removeBorder(image);
+		Mat borderless = bh.removeBorder4(image);
 		Rect temp;
 		int numshade;
 		

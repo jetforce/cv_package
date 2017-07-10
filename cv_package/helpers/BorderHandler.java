@@ -38,7 +38,51 @@ public class BorderHandler {
 	}
     
     
-    
+	public Mat removeBorder4(Mat image) {
+		// made for OMR 
+		
+		Mat borders = getBorders(image, 3,3);
+		Mat nomore = removeBorder(image, borders);
+		
+	
+		return nomore;
+	}
+	
+	public Mat removeBorder(Mat m, Mat location){
+		
+		Mat filled = new Mat(m.rows(), m.cols(), CvType.CV_8UC1, new Scalar(255));
+		Mat inv = location;
+		cv.invert(inv);
+		List<MatOfPoint> contours = cv.findContours(inv, Imgproc.RETR_TREE);
+		contours = this.getLargestContours(contours, 1);
+		MatOfPoint outline = this.getApprox(contours.get(0));
+		contours.add(outline);
+		//saver.saveImage("scratch",num+"filled", filled);
+		Imgproc.drawContours(filled,contours , -1,new Scalar(0),1);
+		
+		Imgcodecs.imwrite("scratch.jpg", filled);
+		
+		//saver.saveImage("scratch",num+"filledconts", filled);
+		
+		Rect rect = Imgproc.boundingRect(outline);
+		int midX = rect.width/2;
+		int midY = rect.height/2;
+        Imgproc.floodFill(filled, new Mat(), new Point(midX, midY), new Scalar(0));
+        //saver.saveImage("scratch", num+"Afterfilled", filled);
+        cv.invert(m);
+        Mat result = new Mat(m.rows(), m.cols(), CvType.CV_8UC1);
+        //saver.saveImage("scratch", num+"orig",m);
+		Core.add(m, filled,result);
+		cv.invert(result);
+		return result;
+		//saver.saveImage("scratch", num+"result",result);
+				
+	}
+	 
+	
+	
+	
+	
     
     
     
