@@ -67,7 +67,7 @@ public class TableSegmentation {
 		
 		
 		BorderHandler bh = new BorderHandler();
-		Mat borders = bh.getBorders(subImage);
+		Mat borders = bh.getBorders(subImage,30,30);
 		
 		
 		Mat blank = new Mat(subImage.rows(), subImage.cols(), CvType.CV_8UC1, new Scalar(0));
