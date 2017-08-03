@@ -39,9 +39,7 @@ public class TableSegmentation {
 		
 		contours =  cv.getLargestContours(contours,2);
 		contours = sort.contourPositions(contours);
-		
-		
-		
+
 		Rect temp;
 		Mat m;
 		
@@ -67,7 +65,7 @@ public class TableSegmentation {
 		
 		
 		BorderHandler bh = new BorderHandler();
-		Mat borders = bh.getBorders(subImage,30,30);
+		Mat borders = bh.getBorders(subImage,5,5);
 		
 		
 		Mat blank = new Mat(subImage.rows(), subImage.cols(), CvType.CV_8UC1, new Scalar(0));
