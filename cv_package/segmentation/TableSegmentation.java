@@ -14,6 +14,7 @@ import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import cv_package.basicelem2.Table;
+import cv_package.debug.LocalSaver;
 import cv_package.helpers.BorderHandler;
 import cv_package.helpers.ComputerVision;
 import cv_package.helpers.MarkRecogTools;
@@ -56,7 +57,58 @@ public class TableSegmentation {
 		}*/
 			
 	}
-	
+
+	public void go(Table tableType, LocalSaver saver, int indexComponent){
+
+
+		Mat subImage = tableType.image;
+
+
+		BorderHandler bh = new BorderHandler();
+		Mat borders = bh.getBorders(subImage,10,10);
+		saver.saveImage("border"+indexComponent,borders);
+
+		Mat blank = new Mat(subImage.rows(), subImage.cols(), CvType.CV_8UC1, new Scalar(0));
+		List<MatOfPoint> contours = new ArrayList<>();
+		Imgproc.findContours(borders, contours, new Mat(),Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
+
+		Log.d("HANNAH", "size of contours of table "+ contours.size());
+
+		//Always add one to consider the biggest square containing everything
+		//Num Rows times 2 because there are two columns.
+		//For now it only supports 2 columns change in the future please
+		contours = cv.getLargestContours(contours, tableType.numRows*2 +1);
+		contours = sort.contourPositions(contours);
+
+		Rect temp;
+		Mat m;
+		//average size is used for the threshold.
+		double averageSize = 0;
+
+
+		//the count starts with 1 because the first contour is the border.
+		for(int i=1; i< contours.size(); i++){
+			temp = Imgproc.boundingRect(contours.get(i));
+			m = subImage.submat(temp);
+			if(i%2==0){
+				//Blob
+				tableType.addBlob(m);
+
+			}else{
+				//OMR
+				m = bh.shrinkPicture(m, .05);
+				averageSize+=m.size().area();
+				tableType.addMark(m, markTools.countWhites(m));
+			}
+		}
+		averageSize = averageSize / tableType.numRows;
+		this.makeDecision(tableType, averageSize);
+
+	}
+
+
+
+
 	
 	public void go(Table tableType){
 		
@@ -65,7 +117,7 @@ public class TableSegmentation {
 		
 		
 		BorderHandler bh = new BorderHandler();
-		Mat borders = bh.getBorders(subImage,5,5);
+		Mat borders = bh.getBorders(subImage,10,10);
 		
 		
 		Mat blank = new Mat(subImage.rows(), subImage.cols(), CvType.CV_8UC1, new Scalar(0));
@@ -103,8 +155,7 @@ public class TableSegmentation {
 		}
 		averageSize = averageSize / tableType.numRows;
 		this.makeDecision(tableType, averageSize);
-		
-		
+
 	}
 	
 	//make decisions

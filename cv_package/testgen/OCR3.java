@@ -70,14 +70,19 @@ public class OCR3{
 			String temp = " ";
 
 
-//			tempsave("_"+x,c); x++;
+			//tempsave("_"+x,c); x++;
 
 			if(c == null) {
 				temp = " ";
 			}
 			else {
+				long time= System.currentTimeMillis();
+				tempsave("b4Morph"+time,c);
+
+				Imgproc.morphologyEx(c, c, Imgproc.MORPH_ERODE, Imgproc.getStructuringElement(Imgproc.CV_SHAPE_ELLIPSE, new Size(3,3)));
+				Imgproc.threshold(c,c,70, 255,Imgproc.THRESH_BINARY);
 				cv.invert(c);
-				String imagepath = folder.save(c);
+				//String imagepath = folder.save(c);
 //				temp = classifier.classify(c) + "";
 
 				switch(comp.type) {
@@ -93,37 +98,37 @@ public class OCR3{
 		return chars;
 	}
 
-//	public void tempsave(String filename, Mat mat) {
-//
-//		String root = Environment.getExternalStorageDirectory().toString() + "/CONVERTER";
-//		File myDir = new File(root);
-//		myDir.mkdirs();
-//
-//		String fname = filename+ ".jpg";
-//		File file = new File(myDir, fname);
-//		if (file.exists()) file.delete();
-//
-//		ComputerVisionUtility cv = new ComputerVisionUtility();
-//		Bitmap bmp = cv.convertToBitmap(mat);
-//		FileOutputStream out = null;
-//		try {
-//			out = new FileOutputStream(file);
-//			bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-//			// PNG is a lossless format, the compression factor (100) is ignored
-//			out.flush();
-//			out.close();
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		} finally {
-//			try {
-//				if (out != null) {
-//					out.close();
-//				}
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
+	public void tempsave(String filename, Mat mat) {
+
+		String root = Environment.getExternalStorageDirectory().toString() + "/CONVERTER";
+		File myDir = new File(root);
+		myDir.mkdirs();
+
+		String fname = filename+ ".png";
+		File file = new File(myDir, fname);
+		if (file.exists()) file.delete();
+
+		ComputerVisionUtility cv = new ComputerVisionUtility();
+		Bitmap bmp = cv.convertToBitmap(mat);
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			bmp.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+			// PNG is a lossless format, the compression factor (100) is ignored
+			out.flush();
+			out.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (out != null) {
+					out.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public boolean hasCharacter(List<MatOfPoint> contours) {
 		boolean hasChar = true;
@@ -290,7 +295,8 @@ public class OCR3{
 //			image = filter.removeSmallContours(image2, smallContours);
 					
 			image = modifyChar(contours.get(0), image2);
-			folder.save(image, "done");
+			Imgproc.resize(image, image, CHAR_SIZE);
+			//folder.save(image, "done");
 		}
 		else {
 			image = null;

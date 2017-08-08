@@ -53,6 +53,7 @@ import cv_package.helpers.Filtering;
 import cv_package.helpers.Sorting;
 import cv_package.paperextractorv2.FourCornerBoxv4;
 import cv_package.segmentation.OpticalMarkSegmentationv2;
+import cv_package.segmentation.SmartSegment;
 import cv_package.segmentation.TableSegmentation;
 
 
@@ -66,7 +67,10 @@ public class Segmenter3 {
 	//private static Folder folder = Folder.getInstance();
 	private static Time time = Time.getInstance();
 	private CharacterClassifier classifier;
-	
+	private Context context;
+
+	private ImageSaver imageSaver;
+
 	Form form;
 	
 	private String filepath, structpath;
@@ -159,32 +163,42 @@ public class Segmenter3 {
 		reader.readToForm(structpath, form);
 	}
 
+
+
+
 	public Form segment(Context context) throws IOException {
 		//folder.save(img, "ORIG");
 		//Change this to change text file
+		this.context = context;
 
+		imageSaver = new ImageSaver("Output",context);
 //		tempsave("_before 4 corn", img);
 		FourCornerBoxv4 extract = new FourCornerBoxv4(new ImageSaver("Output",context),new Logger());
 		Size sz = new Size(1494,2656);
 		Imgproc.resize( img, img, sz );
 		img = extract.extractPaper(img);
 
+		imageSaver.saveImage("normalized",img);
 
 //		tempsave("_after 4 corn", img);
 
 		cv.preprocess(img);
 		//folder.save(img, "PREPROC");
 
-//		tempsave("_preroc", img);
+		//tempsave("_preroc", img);
 
 		time.stamp("form number extracting..");
 		Mat formNumMat = getFormNumberMat(img);
+
+		imageSaver.saveImage("formnumMat",formNumMat);
+
 		int formNum = classifier.classifyDigit(formNumMat);
 		InputStream is = null;
 		switch(formNum){
 			case 1: is = context.getResources().openRawResource(R.raw.w1); break;
 			case 2: is = context.getResources().openRawResource(R.raw.w2); break;
 			case 3: is = context.getResources().openRawResource(R.raw.w3); break;
+			case 4: is = context.getResources().openRawResource(R.raw.w4); break;
 		}
 
 
@@ -204,6 +218,7 @@ public class Segmenter3 {
 		time.stamp("tempsave done");
 
 		form.image = img;
+		imageSaver.saveImage("formImage",img);
 		go(form.image, form.components);
 
 		time.end();
@@ -282,9 +297,7 @@ public class Segmenter3 {
 		List<MatOfPoint> contours =  cv.getSquareContours(image, 200, Imgproc.RETR_EXTERNAL);
 		
 		System.out.println("Contours size "+contours.size());
-		
-		
-		
+
 		Sorting sort = Sorting.getInstance();
 		contours = sort.contourPositions(contours);
 		
@@ -312,17 +325,23 @@ public class Segmenter3 {
 		
 		
 		BorderHandler border = new BorderHandler();
-		Mat location = border.getBorders(image, 80, 80);
+		Mat location = border.getBorders(image, 100, 100);
 
-		
-		List<Mat> mats = filter.largeAreaElements
-				(image.clone(), cv.findContours(location, Imgproc.RETR_EXTERNAL), components.size());
-		
+
+		SmartSegment ss = new SmartSegment();
+
+
+		imageSaver.saveImage("location",location);
+		//List<Mat> mats = filter.largeAreaElements(image.clone(), cv.findContours(location, Imgproc.RETR_EXTERNAL), components.size());
+		List<Mat> mats = filter.getImages(image, ss.getNearestContours(location, form.formNumber,this.context));
 		int index = 0;
 
 		for(Type c:components) {
 			
 			c.image = mats.get(index);
+
+			imageSaver.saveImage("component"+index,c.image);
+
 //			String path2 = save("3-PROCESS-"+index, c.image);
 //			pb.addImage("PREPROC "+index+"-"+c.label, path2);
 			//folder.save(c.image, "3-PROCESS-"+index);
@@ -341,7 +360,7 @@ public class Segmenter3 {
 				break;
 			case "MARK": omr.go((Mark)c); break;
 			case "BLOB": goBlob((Blob)c, mats.get(index)); break;
-				case "TABLE": ts.go((Table) c); break;
+				case "TABLE": ts.go((Table) c,imageSaver,index); break;
 			default: System.out.println("Error typename invalid");
 			}
 			
